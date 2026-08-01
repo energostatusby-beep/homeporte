@@ -788,6 +788,19 @@ html:not(.js) .burger { display: none; }
 }
 .socials__link:hover .socials__note { color: inherit; }
 
+.pinterest-profile {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 22px;
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.pinterest-profile > span,
+.pinterest-profile iframe {
+  max-width: 100% !important;
+}
+
 .contacts__note {
   margin-top: 26px;
   font-size: .95rem;
@@ -1023,6 +1036,7 @@ body.lightbox-open { overflow: hidden; }
   .hero__lead { margin-bottom: 28px; }
   .gallery__grid { gap: 10px; }
   .gcard__caption { font-size: .78rem; }
+  .pinterest-profile { max-width: calc(100vw - 40px); }
 }
 
 /* ---------- Печать ---------- */
