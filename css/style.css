@@ -86,7 +86,9 @@ section { scroll-margin-top: var(--header-h); }
   padding-right: var(--pad);
 }
 
-/* ---------- Кнопки ---------- */
+/* ---------- Кнопки: «жидкое стекло» ---------- */
+.glass-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
 .btn {
   display: inline-block;
   padding: 1.05em 2.4em;
@@ -96,37 +98,67 @@ section { scroll-margin-top: var(--header-h); }
   text-transform: uppercase;
   text-align: center;
   border: 1px solid transparent;
-  transition: background-color .25s ease, color .25s ease, border-color .25s ease;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background-color .25s ease, color .25s ease,
+              border-color .25s ease, transform .3s ease, box-shadow .3s ease;
   cursor: pointer;
+}
+.btn:hover { transform: scale(1.04); }
+
+/* искажение фона за кнопкой — там, где поддерживается url()-фильтр */
+@supports (backdrop-filter: blur(2px) url("#liquid-glass")) {
+  .btn {
+    backdrop-filter: blur(2px) url("#liquid-glass");
+    -webkit-backdrop-filter: blur(2px) url("#liquid-glass");
+  }
+}
+
+/* стеклянная кромка-блик */
+.btn {
+  box-shadow:
+    inset 2px 2px 1px -1px rgba(255, 255, 255, .5),
+    inset -2px -2px 1px -1px rgba(255, 255, 255, .28),
+    inset 0 0 6px 1px rgba(255, 255, 255, .1),
+    0 4px 14px rgba(0, 0, 0, .16);
+}
+.btn:hover {
+  box-shadow:
+    inset 2px 2px 1px -1px rgba(255, 255, 255, .6),
+    inset -2px -2px 1px -1px rgba(255, 255, 255, .35),
+    inset 0 0 8px 2px rgba(255, 255, 255, .14),
+    0 8px 22px rgba(0, 0, 0, .22);
 }
 
 .btn--solid {
-  background: var(--black);
+  background: rgba(17, 17, 17, .74);
   color: var(--white);
-  border-color: var(--black);
+  border-color: rgba(255, 255, 255, .22);
 }
 .btn--solid:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: rgba(143, 69, 38, .8);
+  border-color: rgba(255, 255, 255, .3);
 }
 
 .btn--ghost {
-  border-color: rgba(255, 255, 255, .8);
+  background: rgba(255, 255, 255, .14);
+  border-color: rgba(255, 255, 255, .55);
   color: var(--white);
 }
 .btn--ghost:hover {
-  background: var(--white);
-  color: var(--text);
-  border-color: var(--white);
+  background: rgba(255, 255, 255, .3);
+  border-color: rgba(255, 255, 255, .8);
 }
 
 .btn--outline {
-  border-color: var(--text);
+  background: rgba(255, 255, 255, .35);
+  border-color: rgba(34, 34, 34, .45);
   color: var(--text);
 }
 .btn--outline:hover {
-  background: var(--black);
-  border-color: var(--black);
+  background: rgba(17, 17, 17, .78);
+  border-color: rgba(255, 255, 255, .25);
   color: var(--white);
 }
 
@@ -772,15 +804,22 @@ html:not(.js) .burger { display: none; }
   z-index: 45;
   width: 56px;
   height: 56px;
-  background: var(--black);
+  background: rgba(17, 17, 17, .74);
   color: var(--white);
   display: none;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, .28);
-  transition: background-color .25s ease;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    inset 2px 2px 1px -1px rgba(255, 255, 255, .5),
+    inset -2px -2px 1px -1px rgba(255, 255, 255, .28),
+    0 6px 22px rgba(0, 0, 0, .28);
+  transition: background-color .25s ease, transform .3s ease;
 }
-.fab:hover { background: var(--accent); }
+.fab:hover { background: rgba(143, 69, 38, .85); transform: scale(1.06); }
 .fab svg { width: 26px; height: 26px; }
 
 /* ---------- Футер ---------- */
