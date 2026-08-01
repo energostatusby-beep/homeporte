@@ -255,6 +255,22 @@
           <p class="gallery__cta-text">Больше работ — в нашем Instagram</p>
           <a class="btn btn--solid" href="https://www.instagram.com/homeporte.by" target="_blank" rel="noopener">Смотреть Instagram</a>
         </div>
+        <div class="pinterest-showcase">
+          <div class="pinterest-showcase__head">
+            <p class="pinterest-showcase__eyebrow">Больше идей и проектов</p>
+            <h3 class="pinterest-showcase__title">HomePorte в Pinterest</h3>
+            <p class="pinterest-showcase__lead">Листайте наши работы прямо на сайте или откройте полный профиль в Pinterest.</p>
+          </div>
+          <div class="pinterest-profile" id="pinterest-profile" aria-label="Работы HomePorte в Pinterest">
+            <a data-pin-do="embedUser"
+               data-pin-board-width="1000"
+               data-pin-scale-height="520"
+               data-pin-scale-width="160"
+               href="https://www.pinterest.com/homeporte2018/">
+              Смотреть профиль HomePorte в Pinterest
+            </a>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -303,15 +319,6 @@
                 <svg class="socials__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5c-2 0-3.5 1.4-3.5 3.2 0 1.1.5 2 1.4 2.4l.4-1.4c-.3-.3-.5-.7-.5-1.1 0-1 .9-1.9 2.1-1.9 1.2 0 2 .8 2 1.9 0 1.4-.7 2.6-1.8 2.6-.6 0-1-.4-.9-1l.5-2M11 13l-1 4.5"/></svg>
                 Pinterest</a></li>
             </ul>
-            <div class="pinterest-profile" aria-label="Работы HomePorte в Pinterest">
-              <a data-pin-do="embedUser"
-                 data-pin-board-width="400"
-                 data-pin-scale-height="240"
-                 data-pin-scale-width="80"
-                 href="https://www.pinterest.com/homeporte2018/">
-                HomePorte в Pinterest
-              </a>
-            </div>
             <p class="contacts__note">Не знаете, с чего начать? Напишите в Instagram или просто позвоните — подскажем, посчитаем и пригласим в шоурум посмотреть образцы вживую.</p>
           </div>
         </div>
@@ -383,6 +390,17 @@
     </defs>
   </svg>
 
+  <script>
+    (function () {
+      var wrap = document.getElementById('pinterest-profile');
+      var link = wrap && wrap.querySelector('[data-pin-do="embedUser"]');
+      if (!wrap || !link) return;
+      var width = Math.max(280, Math.min(1000, Math.floor(wrap.getBoundingClientRect().width)));
+      link.setAttribute('data-pin-board-width', String(width));
+      link.setAttribute('data-pin-scale-height', width < 600 ? '380' : '520');
+      link.setAttribute('data-pin-scale-width', width < 600 ? '80' : '160');
+    })();
+  </script>
   <script async defer src="https://assets.pinterest.com/js/pinit.js"></script>
   <script src="js/main.js" defer></script>
 </body>

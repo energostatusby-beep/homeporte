@@ -788,12 +788,48 @@ html:not(.js) .burger { display: none; }
 }
 .socials__link:hover .socials__note { color: inherit; }
 
+.pinterest-showcase {
+  margin-top: clamp(56px, 8vw, 100px);
+  padding-top: clamp(40px, 5vw, 68px);
+  border-top: 1px solid rgba(35, 33, 31, .14);
+}
+
+.pinterest-showcase__head {
+  max-width: 720px;
+  margin: 0 auto clamp(30px, 4vw, 48px);
+  text-align: center;
+}
+
+.pinterest-showcase__eyebrow {
+  color: var(--accent);
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.pinterest-showcase__title {
+  font-size: clamp(2rem, 4.4vw, 4.6rem);
+  font-weight: 300;
+  letter-spacing: -.03em;
+  line-height: 1.05;
+}
+
+.pinterest-showcase__lead {
+  max-width: 58ch;
+  margin: 18px auto 0;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
 .pinterest-profile {
   width: 100%;
-  max-width: 400px;
-  margin-top: 22px;
+  min-height: 580px;
+  display: flex;
+  justify-content: center;
   overflow-x: auto;
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
 .pinterest-profile > span,
@@ -1036,7 +1072,9 @@ body.lightbox-open { overflow: hidden; }
   .hero__lead { margin-bottom: 28px; }
   .gallery__grid { gap: 10px; }
   .gcard__caption { font-size: .78rem; }
-  .pinterest-profile { max-width: calc(100vw - 40px); }
+  .pinterest-showcase { margin-top: 56px; padding-top: 38px; }
+  .pinterest-showcase__head { margin-bottom: 28px; }
+  .pinterest-profile { min-height: 440px; }
 }
 
 /* ---------- Печать ---------- */
