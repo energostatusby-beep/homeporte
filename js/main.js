@@ -325,6 +325,10 @@
     });
   }
 
+  /* ---------- Год в копирайте обновляется сам ---------- */
+  var yearEl = document.getElementById('copyright-year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
   /* ---------- Спотлайт на карточках галереи ---------- */
   var glowCards = document.querySelectorAll('.gcard');
   if (glowCards.length && window.matchMedia('(hover: hover)').matches) {
