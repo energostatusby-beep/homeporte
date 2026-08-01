@@ -3,13 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HomePorte — межкомнатные двери на заказ в Могилёве | Собственное производство</title>
+  <title>HomePorte — межкомнатные двери на заказ в Могилёве</title>
   <meta name="description" content="Собственное производство межкомнатных дверей, лофт-перегородок из стали и алюминия, шкафов и кухонь. Индивидуально под ваш интерьер. Более 20 лет. Шоурум в ТЦ «Ленинград», Могилёв.">
+  <!-- При переезде на собственный домен заменить адреса в og:url, og:image, canonical и в JSON-LD (url, image) -->
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="HomePorte">
+  <meta property="og:url" content="https://energostatusby-beep.github.io/homeporte/">
   <meta property="og:title" content="HomePorte — межкомнатные двери собственного производства">
   <meta property="og:description" content="Двери, лофт-перегородки, шкафы и кухни — индивидуально под ваш интерьер. Семейное производство с итальянскими мотивами, более 20 лет. Могилёв.">
-  <meta property="og:image" content="assets/img/hero/hero-1.jpg">
+  <meta property="og:image" content="https://energostatusby-beep.github.io/homeporte/assets/img/hero/hero-1.jpg">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="848">
   <meta property="og:locale" content="ru_RU">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://energostatusby-beep.github.io/homeporte/">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,12 +29,15 @@
     "@type": "LocalBusiness",
     "name": "HomePorte",
     "description": "Собственное производство межкомнатных дверей, лофт-перегородок из стали и алюминия, шкафов и кухонь на заказ.",
+    "url": "https://energostatusby-beep.github.io/homeporte/",
+    "image": "https://energostatusby-beep.github.io/homeporte/assets/img/hero/hero-1.jpg",
     "telephone": "+375291449666",
     "email": "homeporte@yandex.by",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "ул. Ленина, 27, ТЦ «Ленинград», 2 этаж, павильон 64",
+      "streetAddress": "ул. Ленина, 27, ТЦ «Ленинград», 2-й этаж, павильон 64",
       "addressLocality": "Могилёв",
+      "addressRegion": "Могилёвская область",
       "addressCountry": "BY"
     },
     "openingHoursSpecification": [
@@ -51,7 +61,7 @@
     <div class="header__inner">
       <a class="logo" href="#top" aria-label="HomePorte — на главную">
         <span class="logo__name">HOME<b>PORTE</b></span>
-        <span class="logo__tagline">porte italiane su misura</span>
+        <span class="logo__tagline" lang="it">porte italiane su misura</span>
       </a>
       <nav class="nav" aria-label="Основная навигация">
         <a class="nav__link" href="#about">О нас</a>
@@ -96,15 +106,15 @@
         <div class="hero__slide is-active">
           <img class="hero__img" src="assets/img/hero/hero-1.jpg" alt="Голубые раздвижные двери со стеклом — работа HomePorte" width="1280" height="848" fetchpriority="high">
         </div>
-        <div class="hero__slide">
+        <div class="hero__slide" aria-hidden="true">
           <img class="hero__img" src="assets/img/hero/hero-2.jpg" alt="Стеновые панели и двери из дуба — кабинет" width="1280" height="852" loading="lazy">
         </div>
-        <div class="hero__slide">
+        <div class="hero__slide" aria-hidden="true">
           <img class="hero__img" src="assets/img/hero/hero-3.jpg" alt="Белые двери и стеновые панели в синем коридоре" width="1280" height="852" loading="lazy">
         </div>
       </div>
       <div class="hero__content">
-        <p class="hero__eyebrow">fatto a mano · семейное производство</p>
+        <p class="hero__eyebrow"><span lang="it">fatto a mano</span> · семейное производство</p>
         <h1 class="hero__title">Межкомнатные двери собственного производства</h1>
         <p class="hero__lead">Двери, лофт-перегородки из стали и алюминия, шкафы и кухни — делаем индивидуально под ваш интерьер. Более 20 лет. Могилёв.</p>
         <div class="hero__cta">
@@ -118,7 +128,7 @@
       <button class="hero__arrow hero__arrow--next" type="button" aria-label="Следующий слайд">
         <svg viewBox="0 0 24 48" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 4l16 20L4 44"/></svg>
       </button>
-      <div class="hero__dots" role="tablist" aria-label="Слайды"></div>
+      <div class="hero__dots" role="group" aria-label="Слайды"></div>
       <div class="hero__scroll-hint" aria-hidden="true">
         <svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l10 10L22 2"/></svg>
       </div>
@@ -133,12 +143,12 @@
       <div class="container">
         <div class="section-head">
           <h2 class="section-head__title">О нас</h2>
-          <p class="section-head__accent">storia di famiglia</p>
+          <p class="section-head__accent" lang="it">storia di famiglia</p>
         </div>
         <div class="about__grid">
           <div class="about__text">
             <p>HomePorte — семейное производство из Могилёва. Уже более 20&nbsp;лет мы делаем межкомнатные двери так, как это принято в Италии: вручную, под конкретный дом и конкретного человека. «Porte» по-итальянски — «двери», и в этом слове вся наша философия: дверь — не фон, а часть характера интерьера.</p>
-            <p>Кроме дверей мы производим лофт-перегородки из стали и алюминия, делаем шкафы и кухни. Каждый заказ индивидуален: свои размеры, свой цвет, своя фурнитура. Без каталога «как у всех».</p>
+            <p>Кроме дверей, мы производим лофт-перегородки из стали и алюминия, делаем шкафы и кухни. Каждый заказ индивидуален: свои размеры, свой цвет, своя фурнитура. Без каталога «как у всех».</p>
             <div class="facts">
               <div class="fact">
                 <span class="fact__num">20+</span>
@@ -149,8 +159,8 @@
                 <span class="fact__label">собственное производство</span>
               </div>
               <div class="fact">
-                <span class="fact__num">1&nbsp;заказ</span>
-                <span class="fact__label">один индивидуальный проект</span>
+                <span class="fact__num">1&nbsp;:&nbsp;1</span>
+                <span class="fact__label">каждый заказ — отдельный проект</span>
               </div>
             </div>
           </div>
@@ -189,7 +199,7 @@
       <div class="container">
         <div class="section-head">
           <h2 class="section-head__title">Наши работы</h2>
-          <p class="section-head__accent">lavori su misura</p>
+          <p class="section-head__accent" lang="it">lavori su misura</p>
         </div>
         <ul class="gallery__grid">
           <li class="gcard card">
@@ -253,14 +263,14 @@
       <div class="container">
         <div class="section-head">
           <h2 class="section-head__title">Приезжайте в&nbsp;шоурум</h2>
-          <p class="section-head__accent">benvenuti</p>
+          <p class="section-head__accent" lang="it">benvenuti</p>
         </div>
         <div class="contacts__grid">
           <div class="showroom card">
             <h3 class="showroom__title">Шоурум в Могилёве</h3>
-            <p class="showroom__address">ТЦ «Ленинград», ул. Ленина, 27,<br>2 этаж, павильон 64</p>
+            <p class="showroom__address">ТЦ «Ленинград», ул. Ленина, 27,<br>2-й этаж, павильон 64</p>
             <dl class="showroom__hours">
-              <div class="showroom__hours-row"><dt>Будние дни</dt><dd>11:00–19:00</dd></div>
+              <div class="showroom__hours-row"><dt>Пн–пт</dt><dd>11:00–19:00</dd></div>
               <div class="showroom__hours-row"><dt>Сб–вс</dt><dd>11:00–18:00</dd></div>
             </dl>
             <ul class="showroom__phones">
@@ -309,7 +319,7 @@
     <div class="container footer__grid">
       <div class="footer__brand">
         <p class="footer__logo">HOME<b>PORTE</b></p>
-        <p class="footer__tagline">porte italiane su misura</p>
+        <p class="footer__tagline" lang="it">porte italiane su misura</p>
         <ul class="footer__socials">
           <li><a href="https://www.instagram.com/homeporte.by" target="_blank" rel="noopener">Instagram</a></li>
           <li><a href="https://t.me/HomePorteMinskMoscow" target="_blank" rel="noopener">Telegram</a></li>
@@ -325,7 +335,7 @@
       </nav>
       <div class="footer__legal">
         <p>Индивидуальный предприниматель Мартынов Станислав Владимирович</p>
-        <p>УНП 791092995 · Действует на основании Свидетельства</p>
+        <p>УНП 791092995 · Действует на основании свидетельства о государственной регистрации</p>
         <p>Юридический адрес: г. Могилёв, пр-т Димитрова, д. 66, кв. 27</p>
         <p><a href="mailto:homeporte@yandex.by">homeporte@yandex.by</a></p>
       </div>

@@ -7,7 +7,7 @@
 :root {
   --bg: #ECE8E2;
   --text: #222222;
-  --text-muted: #6d6d6d;
+  --text-muted: #5f5f5f;
   --white: #ffffff;
   --black: #111111;
   --footer-bg: #1a1a1a;
@@ -65,6 +65,16 @@ button {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+/* на тёмных поверхностях терракотовая обводка не видна — используем светлую */
+.footer :focus-visible,
+.mobile-menu :focus-visible,
+.hero :focus-visible,
+.lightbox :focus-visible,
+.side-tab:focus-visible,
+.fab:focus-visible {
+  outline-color: #F3E9E3;
 }
 
 section { scroll-margin-top: var(--header-h); }
@@ -129,7 +139,9 @@ section { scroll-margin-top: var(--header-h); }
 /* ---------- Шапка ---------- */
 .header {
   position: fixed;
-  inset: 0 0 auto 0;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 50;
   transition: background-color .3s ease, box-shadow .3s ease, backdrop-filter .3s ease;
 }
@@ -245,7 +257,10 @@ body.menu-open .logo__tagline { color: rgba(255, 255, 255, .75); }
 /* ---------- Мобильное меню ---------- */
 .mobile-menu {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 60;
   background: #161616;
   display: flex;
@@ -254,15 +269,28 @@ body.menu-open .logo__tagline { color: rgba(255, 255, 255, .75); }
   align-items: center;
   gap: 48px;
   padding: 90px var(--pad) 40px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   transform: translateX(100%);
   visibility: hidden;
   transition: transform .4s cubic-bezier(.22, .61, .36, 1), visibility 0s .4s;
+}
+
+/* низкие вьюпорты (телефон в ландшафте): центрирование обрезало бы верх меню */
+@media (max-height: 640px) {
+  .mobile-menu {
+    justify-content: flex-start;
+    gap: 26px;
+    padding-top: 84px;
+  }
 }
 body.menu-open .mobile-menu {
   transform: translateX(0);
   visibility: visible;
   transition: transform .4s cubic-bezier(.22, .61, .36, 1);
 }
+html.menu-open,
+html.menu-open body,
 body.menu-open { overflow: hidden; }
 
 .mobile-menu__nav { display: flex; flex-direction: column; align-items: center; gap: 22px; }
@@ -293,6 +321,7 @@ body.menu-open { overflow: hidden; }
 /* ---------- Hero ---------- */
 .hero {
   position: relative;
+  height: 100vh;
   height: 100svh;
   min-height: 560px;
   display: flex;
@@ -302,11 +331,14 @@ body.menu-open { overflow: hidden; }
   color: var(--white);
 }
 
-.hero__slides { position: absolute; inset: 0; }
+.hero__slides { position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
 
 .hero__slide {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   opacity: 0;
   transition: opacity 1s ease;
 }
@@ -322,7 +354,10 @@ body.menu-open { overflow: hidden; }
 .hero__slide::after {
   content: "";
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: linear-gradient(180deg, rgba(17,17,17,.35) 0%, rgba(17,17,17,.45) 55%, rgba(17,17,17,.62) 100%);
 }
 
@@ -388,6 +423,12 @@ body.menu-open { overflow: hidden; }
 .hero__arrow--prev { left: clamp(4px, 2vw, 28px); }
 .hero__arrow--next { right: clamp(4px, 2vw, 28px); }
 
+/* на широких экранах отводим стрелки от боковых закладок */
+@media (min-width: 1200px) {
+  .hero__arrow--prev { left: 56px; }
+  .hero__arrow--next { right: 56px; }
+}
+
 .hero__dots {
   position: absolute;
   bottom: 74px;
@@ -433,7 +474,8 @@ body.menu-open { overflow: hidden; }
 /* элементы слайдера видимы только с JS */
 html:not(.js) .hero__arrow,
 html:not(.js) .hero__dots,
-html:not(.js) .hero__scroll-hint { display: none; }
+html:not(.js) .hero__scroll-hint,
+html:not(.js) .burger { display: none; }
 
 /* ---------- Боковые закладки ---------- */
 .side-tab {
@@ -562,12 +604,45 @@ html:not(.js) .hero__scroll-hint { display: none; }
 }
 
 .gcard {
+  position: relative;
   padding: clamp(8px, 1vw, 12px) clamp(8px, 1vw, 12px) 0;
   transition: transform .25s ease, box-shadow .25s ease;
 }
 .gcard:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-card-hover);
+}
+
+/* спотлайт: тёплое пятно света и кромка, следующие за курсором */
+.gcard::after {
+  content: "";
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .35s ease;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(166, 82, 46, .14), transparent 65%);
+}
+.gcard::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .35s ease;
+  padding: 1px;
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(166, 82, 46, .85), transparent 70%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  z-index: 1;
+}
+@media (hover: hover) {
+  .gcard:hover::after,
+  .gcard:hover::before { opacity: 1; }
 }
 
 .gcard__link {
@@ -712,11 +787,14 @@ html:not(.js) .hero__scroll-hint { display: none; }
 .footer {
   background: var(--footer-bg);
   color: rgba(255, 255, 255, .85);
-  border-top: 3px solid;
+  border-top: 3px solid var(--tricolor-green);
   border-image: linear-gradient(90deg,
-    var(--tricolor-green) 0 33.33%,
-    #d8d4cc 33.33% 66.66%,
-    var(--tricolor-red) 66.66% 100%) 1;
+    var(--tricolor-green) 0%,
+    var(--tricolor-green) 33.33%,
+    #d8d4cc 33.33%,
+    #d8d4cc 66.66%,
+    var(--tricolor-red) 66.66%,
+    var(--tricolor-red) 100%) 1;
 }
 
 .footer__grid {
@@ -739,7 +817,7 @@ html:not(.js) .hero__scroll-hint { display: none; }
   font-family: var(--font-accent);
   font-style: italic;
   font-size: .95rem;
-  color: var(--accent-bright);
+  color: #C46A42;
   margin: 4px 0 20px;
 }
 
@@ -779,7 +857,7 @@ html:not(.js) .hero__scroll-hint { display: none; }
   padding: 20px var(--pad);
   text-align: center;
   font-size: .78rem;
-  color: rgba(255, 255, 255, .4);
+  color: rgba(255, 255, 255, .55);
 }
 
 /* ---------- Лайтбокс ---------- */
@@ -791,11 +869,15 @@ html:not(.js) .hero__scroll-hint { display: none; }
   max-height: 100vh;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   display: none;
   align-items: center;
   justify-content: center;
 }
 .lightbox[open] { display: flex; }
+
+/* страница не должна прокручиваться под открытым лайтбоксом */
+body.lightbox-open { overflow: hidden; }
 
 .lightbox::backdrop { background: rgba(12, 12, 12, .92); }
 
@@ -883,6 +965,9 @@ html:not(.js) .hero__scroll-hint { display: none; }
   .header__phone { display: none; }
   .burger { display: flex; }
 
+  /* без JS бургер мёртв — показываем обычные якоря */
+  html:not(.js) .nav { display: flex; gap: 14px; }
+
   .dirs { grid-template-columns: 1fr; }
   .gallery__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
@@ -899,6 +984,30 @@ html:not(.js) .hero__scroll-hint { display: none; }
   .hero__lead { margin-bottom: 28px; }
   .gallery__grid { gap: 10px; }
   .gcard__caption { font-size: .78rem; }
+}
+
+/* ---------- Печать ---------- */
+@media print {
+  .header, .side-tab, .fab,
+  .hero__arrow, .hero__dots, .hero__scroll-hint,
+  .mobile-menu, .lightbox { display: none !important; }
+
+  body { background: none; }
+  .hero { height: auto; min-height: 0; }
+  .hero__slide { position: static; opacity: 1; }
+  .hero__slide:not(.is-active) { display: none; }
+  .hero__content { color: #000; }
+  .hero__eyebrow, .hero__lead { color: #333; }
+
+  .footer, .footer__bottom {
+    background: none;
+    color: #000;
+    border: 0;
+  }
+  .footer a, .footer__logo, .footer__tagline,
+  .footer__nav a, .footer__socials a, .footer__legal { color: #000; }
+
+  .btn { color: #000 !important; border: 1px solid #000 !important; background: none !important; }
 }
 
 /* ---------- Reduced motion ---------- */
