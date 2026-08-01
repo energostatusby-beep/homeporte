@@ -110,7 +110,7 @@
         setActive(entry.target.id, entry.isIntersecting);
       });
     }, { rootMargin: '-40% 0px -55% 0px' });
-    ['about', 'gallery', 'contacts'].forEach(function (id) {
+    ['about', 'gallery', 'projects', 'quiz', 'faq', 'contacts'].forEach(function (id) {
       var el = document.getElementById(id);
       if (el) sectionObserver.observe(el);
     });
@@ -226,6 +226,103 @@
         pressOnBackdrop = false;
       });
     }
+  }
+
+  /* ---------- Квиз «Рассчитать стоимость» ---------- */
+  var quizForm = document.getElementById('quiz-form');
+  if (quizForm) {
+    var steps = Array.prototype.slice.call(quizForm.querySelectorAll('.quiz__step'));
+    var progress = document.getElementById('quiz-progress');
+    var nextBtn2 = document.getElementById('quiz-next');
+    var backBtn = document.getElementById('quiz-back');
+    var quizNav = document.getElementById('quiz-nav');
+    var result = document.getElementById('quiz-result');
+    var summary = document.getElementById('quiz-summary');
+    var tgLink = document.getElementById('quiz-tg');
+    var mailLink = document.getElementById('quiz-mail');
+    var stepIndex = 0;
+
+    var showStep = function (i) {
+      stepIndex = i;
+      steps.forEach(function (s, k) { s.hidden = (k !== i); });
+      progress.textContent = 'Шаг ' + (i + 1) + ' из ' + steps.length;
+      backBtn.hidden = (i === 0);
+      nextBtn2.textContent = (i === steps.length - 1) ? 'Готово' : 'Далее';
+    };
+
+    var fieldValue = function (name) {
+      var el = quizForm.querySelector('[name="' + name + '"]:checked') ||
+               quizForm.querySelector('[name="' + name + '"]');
+      return el ? el.value.trim() : '';
+    };
+
+    var buildSummary = function () {
+      var lines = [
+        'Заявка с сайта HomePorte',
+        'Изделие: ' + fieldValue('item'),
+        'Количество: ' + fieldValue('qty'),
+        'Этап ремонта: ' + fieldValue('stage')
+      ];
+      var name = fieldValue('name');
+      var contact = fieldValue('contact');
+      var comment = fieldValue('comment');
+      if (name) lines.push('Имя: ' + name);
+      if (contact) lines.push('Контакт: ' + contact);
+      if (comment) lines.push('Комментарий: ' + comment);
+      return lines.join('\n');
+    };
+
+    nextBtn2.addEventListener('click', function () {
+      if (stepIndex < steps.length - 1) {
+        showStep(stepIndex + 1);
+        return;
+      }
+      /* финал: собираем заявку */
+      var text = buildSummary();
+      summary.value = text;
+      mailLink.href = 'mailto:homeporte@yandex.by?subject=' +
+        encodeURIComponent('Заявка с сайта HomePorte') +
+        '&body=' + encodeURIComponent(text);
+      steps.forEach(function (s) { s.hidden = true; });
+      quizNav.hidden = true;
+      progress.textContent = 'Заявка сформирована';
+      result.hidden = false;
+    });
+
+    backBtn.addEventListener('click', function () {
+      if (stepIndex > 0) showStep(stepIndex - 1);
+    });
+
+    /* Telegram не принимает текст в ссылке на чат — копируем заявку в буфер */
+    tgLink.addEventListener('click', function () {
+      if (navigator.clipboard) navigator.clipboard.writeText(summary.value).catch(function () {});
+      else { summary.select(); document.execCommand('copy'); }
+    });
+
+    quizForm.addEventListener('submit', function (e) { e.preventDefault(); });
+    showStep(0);
+  }
+
+  /* ---------- Быстрая форма ---------- */
+  var qfTg = document.getElementById('qf-tg');
+  var qfMail = document.getElementById('qf-mail');
+  if (qfTg && qfMail) {
+    var qfText = function () {
+      var name = (document.getElementById('qf-name').value || '').trim();
+      var contact = (document.getElementById('qf-contact').value || '').trim();
+      var lines = ['Заявка с сайта HomePorte — перезвоните мне'];
+      if (name) lines.push('Имя: ' + name);
+      if (contact) lines.push('Контакт: ' + contact);
+      return lines.join('\n');
+    };
+    qfTg.addEventListener('click', function () {
+      if (navigator.clipboard) navigator.clipboard.writeText(qfText()).catch(function () {});
+    });
+    qfMail.addEventListener('click', function () {
+      qfMail.href = 'mailto:homeporte@yandex.by?subject=' +
+        encodeURIComponent('Заявка с сайта HomePorte') +
+        '&body=' + encodeURIComponent(qfText());
+    });
   }
 
   /* ---------- Спотлайт на карточках галереи ---------- */

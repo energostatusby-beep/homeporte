@@ -845,6 +845,329 @@ html:not(.js) .burger { display: none; }
   line-height: 1.65;
 }
 
+/* ---------- Как проходит заказ ---------- */
+.process__steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 20px);
+  counter-reset: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.process__step {
+  padding: clamp(20px, 2.4vw, 32px);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.process__step:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.process__num {
+  display: block;
+  font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+  font-weight: 200;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.process__title {
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.process__desc {
+  font-size: .88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ---------- Материалы ---------- */
+.materials__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 24px);
+}
+
+.material {
+  padding: clamp(22px, 2.6vw, 36px);
+  border-top: 3px solid var(--accent);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.material:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.material__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.material__desc {
+  font-size: .9rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ---------- Проекты ---------- */
+.projects__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2.2vw, 28px);
+}
+
+.project {
+  overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.project:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.project__img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.project__body { padding: clamp(20px, 2.4vw, 30px); }
+
+.project__title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.project__desc {
+  font-size: .92rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.project__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: .85rem;
+  border-top: 1px solid rgba(0, 0, 0, .08);
+  padding-top: 14px;
+}
+.project__meta li { display: flex; gap: 10px; line-height: 1.5; }
+.project__meta span {
+  flex-shrink: 0;
+  min-width: 86px;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding-top: 2px;
+}
+
+.projects__note {
+  margin-top: clamp(24px, 3vw, 40px);
+  text-align: center;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  color: var(--text-muted);
+}
+
+/* ---------- Квиз и быстрая форма ---------- */
+.quiz__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 40px);
+  align-items: start;
+}
+
+.quiz__card {
+  padding: clamp(24px, 3.4vw, 48px);
+  border: none;
+  margin: 0;
+}
+
+.quiz__progress {
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+
+.quiz__step { border: none; margin: 0; padding: 0; }
+
+.quiz__question {
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: 18px;
+}
+
+.quiz__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.quiz__option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border: 1px solid rgba(0, 0, 0, .14);
+  cursor: pointer;
+  transition: border-color .2s ease, background-color .2s ease;
+  font-size: .95rem;
+}
+.quiz__option:hover { border-color: var(--accent); }
+.quiz__option:has(input:checked) {
+  border-color: var(--accent);
+  background: rgba(166, 82, 46, .06);
+}
+.quiz__option input { accent-color: var(--accent); margin: 0; }
+
+.quiz__fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+
+.quiz__field { display: flex; flex-direction: column; gap: 5px; }
+.quiz__field span {
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.quiz__field input,
+.quiz__field textarea {
+  font: inherit;
+  font-size: .95rem;
+  padding: 11px 14px;
+  border: 1px solid rgba(0, 0, 0, .18);
+  background: var(--white);
+  color: var(--text);
+  resize: vertical;
+}
+.quiz__field input:focus,
+.quiz__field textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.quiz__nav { display: flex; gap: 12px; justify-content: space-between; }
+.quiz__nav .quiz__next { margin-left: auto; }
+
+.quiz__result-title { font-weight: 600; margin-bottom: 12px; }
+
+.quiz__summary {
+  width: 100%;
+  font: inherit;
+  font-size: .9rem;
+  line-height: 1.6;
+  padding: 14px;
+  border: 1px dashed rgba(0, 0, 0, .25);
+  background: rgba(0, 0, 0, .02);
+  color: var(--text);
+  margin-bottom: 16px;
+  resize: none;
+}
+
+.quiz__send { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+
+.quiz__hint {
+  font-size: .82rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+.quiz__hint a { color: var(--accent); }
+
+.quiz__noscript { font-size: .95rem; }
+.quiz__noscript a { color: var(--accent); }
+html:not(.js) .quiz__nav,
+html:not(.js) .quiz__progress { display: none; }
+html:not(.js) .quiz__step[hidden] { display: block; }
+
+.quickform { padding: clamp(22px, 2.8vw, 36px); display: flex; flex-direction: column; gap: 14px; }
+.quickform__title { font-size: 1.1rem; font-weight: 600; }
+.quickform__desc { font-size: .9rem; color: var(--text-muted); line-height: 1.55; }
+.quickform__send { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Отзывы ---------- */
+.reviews__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 24px);
+}
+
+.review { padding: clamp(22px, 2.6vw, 34px); margin: 0; }
+
+.reviews__note {
+  margin-top: clamp(20px, 2.6vw, 32px);
+  text-align: center;
+  font-size: .85rem;
+  color: var(--text-muted);
+}
+.reviews__note a { color: var(--accent); border-bottom: 1px solid currentColor; }
+.review__text {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+.review__author { font-size: .84rem; color: var(--text-muted); }
+
+/* ---------- FAQ ---------- */
+.faq__list {
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq__item { padding: 0; }
+
+.faq__q {
+  cursor: pointer;
+  list-style: none;
+  padding: 18px clamp(18px, 2.4vw, 28px);
+  font-size: 1rem;
+  font-weight: 600;
+  position: relative;
+  padding-right: 52px;
+  transition: color .2s ease;
+}
+.faq__q::-webkit-details-marker { display: none; }
+.faq__q::after {
+  content: "+";
+  position: absolute;
+  right: clamp(18px, 2.4vw, 28px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  font-weight: 200;
+  color: var(--accent);
+  transition: transform .25s ease;
+}
+.faq__item[open] .faq__q::after { transform: translateY(-50%) rotate(45deg); }
+.faq__q:hover { color: var(--accent); }
+
+.faq__a {
+  padding: 0 clamp(18px, 2.4vw, 28px) 20px;
+  font-size: .93rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  max-width: 68ch;
+}
+
 /* ---------- Плавающая кнопка Instagram ---------- */
 .fab {
   position: fixed;
@@ -1038,12 +1361,17 @@ body.lightbox-open { overflow: hidden; }
 
 @media (max-width: 1024px) {
   .gallery__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .process__steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .materials__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .projects__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 860px) {
   .about__grid { grid-template-columns: 1fr; }
   .about__photo { order: -1; max-width: 560px; }
   .contacts__grid { grid-template-columns: 1fr; }
+  .quiz__grid { grid-template-columns: 1fr; }
+  .reviews__grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
@@ -1058,6 +1386,9 @@ body.lightbox-open { overflow: hidden; }
 
   .dirs { grid-template-columns: 1fr; }
   .gallery__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .process__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .materials__grid { grid-template-columns: 1fr; }
+  .projects__grid { grid-template-columns: 1fr; }
 
   .fab { display: flex; }
 
@@ -1075,6 +1406,8 @@ body.lightbox-open { overflow: hidden; }
   .pinterest-showcase { margin-top: 56px; padding-top: 38px; }
   .pinterest-showcase__head { margin-bottom: 28px; }
   .pinterest-profile { min-height: 440px; }
+  .process__steps { grid-template-columns: 1fr; }
+  .quiz__send .btn, .quickform__send .btn { width: 100%; }
 }
 
 /* ---------- Печать ---------- */
