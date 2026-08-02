@@ -832,17 +832,19 @@ main { counter-reset: sec; }
 
 /* ритм лукбука: якорный кадр и широкая фактурная вставка */
 .gallery__grid { grid-auto-flow: dense; }
+.gcard { display: flex; flex-direction: column; }
+/* при растяжении ряда лишнюю высоту забирает фото, а не пустота под подписью */
+.gcard__link { flex: 1 0 auto; min-height: 0; }
 .gallery__grid > li:first-child { grid-column: span 2; grid-row: span 2; }
-.gallery__grid > li:last-child { grid-column: span 2; }
-.gallery__grid > li:first-child,
-.gallery__grid > li:last-child { display: flex; flex-direction: column; }
-.gallery__grid > li:first-child .gcard__link,
-.gallery__grid > li:last-child .gcard__link {
+.gallery__grid > li:first-child .gcard__link {
   aspect-ratio: auto;
-  flex: 1;
-  min-height: 0;
+  flex: 1 1 auto;
 }
-.gallery__grid > li:last-child .gcard__link { min-height: 220px; }
+.gallery__grid > li:last-child { grid-column: span 2; }
+.gallery__grid > li:last-child .gcard__link {
+  aspect-ratio: 16 / 9;
+  flex: 0 0 auto;
+}
 
 /* арочные маски-порталы на части кадров */
 .gallery__grid > li:nth-child(even):not(:last-child) .gcard__link {
