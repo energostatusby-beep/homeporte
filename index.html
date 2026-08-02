@@ -20,7 +20,11 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@200;300;400;600&family=Cormorant:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+  <!-- шрифты грузятся асинхронно: первый кадр рисуется системным шрифтом без блокировки -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geologica:wght@200;300;400;600&family=Cormorant:ital,wght@1,500;1,600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@200;300;400;600&family=Cormorant:ital,wght@1,500;1,600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@200;300;400;600&family=Cormorant:ital,wght@1,500;1,600&display=swap"></noscript>
+  <link rel="preload" as="image" imagesrcset="assets/img/hero/hero-1-m.jpg 760w, assets/img/hero/hero-1.jpg 1280w" imagesizes="100vw" fetchpriority="high">
   <link rel="stylesheet" href="css/style.css">
   <script>document.documentElement.classList.add('js');</script>
   <script type="application/ld+json">
@@ -129,13 +133,13 @@
     <section class="hero" aria-label="HomePorte — производство дверей">
       <div class="hero__slides">
         <div class="hero__slide is-active">
-          <img class="hero__img" src="assets/img/hero/hero-1.jpg" alt="Голубые раздвижные двери со стеклом — работа HomePorte" width="1280" height="848" fetchpriority="high">
+          <img class="hero__img" src="assets/img/hero/hero-1.jpg" srcset="assets/img/hero/hero-1-m.jpg 760w, assets/img/hero/hero-1.jpg 1280w" sizes="100vw" alt="Голубые раздвижные двери со стеклом — работа HomePorte" width="1280" height="848" fetchpriority="high">
         </div>
         <div class="hero__slide" aria-hidden="true">
-          <img class="hero__img" src="assets/img/hero/hero-2.jpg" alt="Стеновые панели и двери из дуба — кабинет" width="1280" height="852" loading="lazy">
+          <img class="hero__img" src="assets/img/hero/hero-2.jpg" srcset="assets/img/hero/hero-2-m.jpg 760w, assets/img/hero/hero-2.jpg 1280w" sizes="100vw" alt="Стеновые панели и двери из дуба — кабинет" width="1280" height="852" loading="lazy">
         </div>
         <div class="hero__slide" aria-hidden="true">
-          <img class="hero__img" src="assets/img/hero/hero-3.jpg" alt="Кабинет с дубовыми стеновыми панелями и красным диваном честерфилд" width="1280" height="852" loading="lazy">
+          <img class="hero__img" src="assets/img/hero/hero-3.jpg" srcset="assets/img/hero/hero-3-m.jpg 760w, assets/img/hero/hero-3.jpg 1280w" sizes="100vw" alt="Кабинет с дубовыми стеновыми панелями и красным диваном честерфилд" width="1280" height="852" loading="lazy">
         </div>
       </div>
       <div class="hero__grain" aria-hidden="true"></div>
