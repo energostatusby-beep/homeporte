@@ -442,82 +442,125 @@
         </div>
         <div class="constructor__grid">
           <div class="constructor__preview card">
-            <svg class="constructor__door" viewBox="0 0 320 600" aria-label="Предпросмотр двери">
+            <svg class="constructor__door" id="door-svg" viewBox="0 0 360 640" aria-label="Предпросмотр двери">
               <defs>
-                <pattern id="wood-oak" width="26" height="600" patternUnits="userSpaceOnUse">
-                  <rect width="26" height="600" fill="#8A6B4D"/>
-                  <path d="M6 0 C4 150 9 300 5 600" stroke="#75573C" stroke-width="2.2" fill="none"/>
-                  <path d="M14 0 C16 200 12 380 15 600" stroke="#7C5F43" stroke-width="1.4" fill="none"/>
-                  <path d="M21 0 C19 160 23 420 20 600" stroke="#96775A" stroke-width="1.2" fill="none"/>
+                <pattern id="wood-oak" width="26" height="640" patternUnits="userSpaceOnUse">
+                  <rect width="26" height="640" fill="#8A6B4D"/>
+                  <path d="M6 0 C4 150 9 300 5 640" stroke="#75573C" stroke-width="2.2" fill="none"/>
+                  <path d="M14 0 C16 200 12 380 15 640" stroke="#7C5F43" stroke-width="1.4" fill="none"/>
+                  <path d="M21 0 C19 160 23 420 20 640" stroke="#96775A" stroke-width="1.2" fill="none"/>
+                </pattern>
+                <pattern id="wood-oakgrey" width="26" height="640" patternUnits="userSpaceOnUse">
+                  <rect width="26" height="640" fill="#948D84"/>
+                  <path d="M6 0 C4 150 9 300 5 640" stroke="#7E776E" stroke-width="2.2" fill="none"/>
+                  <path d="M14 0 C16 200 12 380 15 640" stroke="#867F76" stroke-width="1.4" fill="none"/>
+                  <path d="M21 0 C19 160 23 420 20 640" stroke="#A29B92" stroke-width="1.2" fill="none"/>
+                </pattern>
+                <pattern id="wood-alder" width="26" height="640" patternUnits="userSpaceOnUse">
+                  <rect width="26" height="640" fill="#C09067"/>
+                  <path d="M6 0 C4 150 9 300 5 640" stroke="#A97C55" stroke-width="2" fill="none"/>
+                  <path d="M15 0 C17 200 13 380 16 640" stroke="#B08359" stroke-width="1.3" fill="none"/>
                 </pattern>
               </defs>
-              <rect x="0" y="588" width="320" height="12" fill="rgba(0,0,0,.12)"/>
-              <rect id="d-frame" x="34" y="14" width="252" height="574" fill="#F2F0EB"/>
-              <rect x="48" y="28" width="224" height="560" fill="rgba(0,0,0,.08)"/>
-              <rect id="d-leaf" x="52" y="32" width="216" height="556" fill="#F2F0EB"/>
-              <g id="d-model-classic2" stroke-width="2.4" fill="rgba(0,0,0,.05)">
-                <rect x="82" y="70" width="156" height="210" rx="2"/>
-                <rect x="82" y="330" width="156" height="210" rx="2"/>
-              </g>
-              <g id="d-model-classic3" stroke-width="2.4" fill="rgba(0,0,0,.05)" style="display:none">
-                <rect x="82" y="64" width="156" height="150"/>
-                <rect x="82" y="252" width="156" height="120"/>
-                <rect x="82" y="410" width="156" height="132"/>
-              </g>
-              <g id="d-model-glass" style="display:none">
-                <rect id="d-glass" x="82" y="70" width="156" height="470" fill="#CFE0E6" opacity=".85"/>
-                <g id="d-glass-grid" stroke-width="2.2" fill="none">
-                  <path d="M160 70v470M82 187h156M82 305h156M82 423h156"/>
-                </g>
-              </g>
-              <g id="d-handle">
-                <circle id="d-rosette" cx="248" cy="315" r="7" fill="#B08D57"/>
-                <rect id="d-lever" x="216" y="310" width="34" height="9" rx="4.5" fill="#B08D57"/>
-              </g>
+              <g id="door-scene"></g>
             </svg>
-            <p class="constructor__caption" id="constructor-caption">Классика · 2 филёнки · эмаль «белая» · латунь</p>
+            <div class="wallpick" role="group" aria-label="Цвет стены для примерки">
+              <span class="wallpick__label">Стена:</span>
+              <button type="button" class="wallchip is-on" data-wall="cream" style="--sw:#E6E0D6" aria-label="Светлая стена"></button>
+              <button type="button" class="wallchip" data-wall="blue" style="--sw:#4E7396" aria-label="Синяя стена"></button>
+              <button type="button" class="wallchip" data-wall="olive" style="--sw:#6F7462" aria-label="Оливковая стена"></button>
+            </div>
+            <p class="constructor__caption" id="constructor-caption"></p>
           </div>
           <div class="constructor__options">
+            <fieldset class="copt" data-opt="type">
+              <legend>Тип открывания</legend>
+              <div class="copt__chips">
+                <button type="button" class="chip is-on" data-value="swing">Распашная</button>
+                <button type="button" class="chip" data-value="double">Двустворчатая</button>
+                <button type="button" class="chip" data-value="sliding">Раздвижная</button>
+              </div>
+            </fieldset>
             <fieldset class="copt" data-opt="model">
               <legend>Модель</legend>
               <div class="copt__chips">
-                <button type="button" class="chip is-on" data-value="classic2">Классика · 2 филёнки</button>
-                <button type="button" class="chip" data-value="classic3">Классика · 3 филёнки</button>
-                <button type="button" class="chip" data-value="smooth">Гладкая современная</button>
-                <button type="button" class="chip" data-value="glass">Со стеклом</button>
+                <button type="button" class="chip" data-value="dg2">Классика ДГ2</button>
+                <button type="button" class="chip is-on" data-value="dg3">Классика ДГ3</button>
+                <button type="button" class="chip" data-value="palazzo">Палаццо</button>
+                <button type="button" class="chip" data-value="modern">Модерн · гладкая</button>
+                <button type="button" class="chip" data-value="country">Кантри ДО · со стеклом</button>
+                <button type="button" class="chip" data-value="hidden">Невидимка</button>
+              </div>
+            </fieldset>
+            <fieldset class="copt" data-opt="height">
+              <legend>Высота</legend>
+              <div class="copt__chips">
+                <button type="button" class="chip is-on" data-value="std">Стандарт · 2000 мм</button>
+                <button type="button" class="chip" data-value="h2300">Высокая · 2300 мм</button>
+                <button type="button" class="chip" data-value="ceiling">Под потолок · до 2600</button>
+              </div>
+            </fieldset>
+            <fieldset class="copt" data-opt="transom" id="copt-transom">
+              <legend>Фрамуга</legend>
+              <div class="copt__chips">
+                <button type="button" class="chip is-on" data-value="none">Без фрамуги</button>
+                <button type="button" class="chip" data-value="glass">Фрамуга со стеклом</button>
               </div>
             </fieldset>
             <fieldset class="copt" data-opt="finish">
               <legend>Цвет и отделка</legend>
               <div class="copt__chips">
-                <button type="button" class="chip chip--swatch is-on" data-value="white" style="--sw:#F2F0EB">Эмаль «белая»</button>
-                <button type="button" class="chip chip--swatch" data-value="blue" style="--sw:#7C99B4">Эмаль «голубая»</button>
-                <button type="button" class="chip chip--swatch" data-value="olive" style="--sw:#5F6B4F">Эмаль «олива»</button>
-                <button type="button" class="chip chip--swatch" data-value="graphite" style="--sw:#3A3D40">Эмаль «графит»</button>
+                <button type="button" class="chip chip--swatch is-on" data-value="white" style="--sw:#F2F0EB">Белая · RAL 9003</button>
+                <button type="button" class="chip chip--swatch" data-value="ivory" style="--sw:#F1EDE0">Слоновая кость · RAL 9010</button>
+                <button type="button" class="chip chip--swatch" data-value="grey" style="--sw:#C6C3BC">Светло-серая · RAL 7044</button>
+                <button type="button" class="chip chip--swatch" data-value="blue" style="--sw:#7C99B4">Голубая · NCS</button>
+                <button type="button" class="chip chip--swatch" data-value="olive" style="--sw:#6B7159">Олива · NCS</button>
+                <button type="button" class="chip chip--swatch" data-value="graphite" style="--sw:#3A3D40">Графит</button>
+                <button type="button" class="chip chip--swatch" data-value="black" style="--sw:#1F1F21">Чёрная · RAL 9005</button>
                 <button type="button" class="chip chip--swatch" data-value="oak" style="--sw:#8A6B4D">Шпон дуба</button>
+                <button type="button" class="chip chip--swatch" data-value="oakgrey" style="--sw:#948D84">Дуб серый · браш</button>
+                <button type="button" class="chip chip--swatch" data-value="alder" style="--sw:#C09067">Массив ольхи</button>
+              </div>
+            </fieldset>
+            <fieldset class="copt" data-opt="patina" id="copt-patina">
+              <legend>Патина по багету</legend>
+              <div class="copt__chips">
+                <button type="button" class="chip is-on" data-value="none">Без патины</button>
+                <button type="button" class="chip chip--swatch" data-value="silver" style="--sw:#C7C9CC">Серебро</button>
+                <button type="button" class="chip chip--swatch" data-value="gold" style="--sw:#C9A96B">Золото</button>
               </div>
             </fieldset>
             <fieldset class="copt" data-opt="glass" id="copt-glass" hidden>
               <legend>Стекло</legend>
               <div class="copt__chips">
-                <button type="button" class="chip is-on" data-value="clear">Прозрачное</button>
+                <button type="button" class="chip is-on" data-value="clear">Прозрачное осветлённое</button>
                 <button type="button" class="chip" data-value="satin">Сатин</button>
                 <button type="button" class="chip" data-value="reeded">Рифлёное</button>
+                <button type="button" class="chip" data-value="facet">С фацетом</button>
+                <button type="button" class="chip" data-value="stopsol">StopSol · зеркальное</button>
               </div>
             </fieldset>
             <fieldset class="copt" data-opt="hardware">
               <legend>Фурнитура</legend>
               <div class="copt__chips">
-                <button type="button" class="chip chip--swatch is-on" data-value="brass" style="--sw:#B08D57">Латунь</button>
+                <button type="button" class="chip chip--swatch is-on" data-value="brass" style="--sw:#B08D57">Латунь состаренная</button>
+                <button type="button" class="chip chip--swatch" data-value="gold" style="--sw:#C9A227">Золото</button>
                 <button type="button" class="chip chip--swatch" data-value="chrome" style="--sw:#C9CDD1">Хром</button>
                 <button type="button" class="chip chip--swatch" data-value="black" style="--sw:#2B2B2B">Чёрная матовая</button>
+              </div>
+            </fieldset>
+            <fieldset class="copt" data-opt="hinges" id="copt-hinges">
+              <legend>Петли</legend>
+              <div class="copt__chips">
+                <button type="button" class="chip is-on" data-value="std">Обычные</button>
+                <button type="button" class="chip" data-value="hidden">Скрытые</button>
               </div>
             </fieldset>
             <div class="constructor__actions">
               <a class="btn btn--solid btn--arrow" id="constructor-send" href="https://t.me/HomePorteMinskMoscow" target="_blank" rel="noopener">Отправить конфигурацию в Telegram</a>
               <button class="btn btn--outline" type="button" id="constructor-to-quiz">Продолжить в расчёте</button>
             </div>
-            <p class="quiz__hint">Это эскиз для разговора, а не оферта: реальную дверь соберём под ваш проём, с любым цветом по RAL/NCS и фурнитурой на выбор.</p>
+            <p class="quiz__hint">Модели — из реальных коллекций HomePorte. Это эскиз для разговора, а не оферта: соберём дверь под ваш проём, покрасим в любой цвет по каталогам RAL и NCS.</p>
           </div>
         </div>
       </div>

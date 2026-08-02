@@ -478,49 +478,190 @@
     }, { passive: true });
   }
 
-  /* ---------- Конфигуратор «Соберите свою дверь» ---------- */
+  /* ---------- Конфигуратор «Соберите свою дверь» (параметрический SVG) ---------- */
   var constructorEl = document.getElementById('constructor');
   if (constructorEl) {
-    var cfg = { model: 'classic2', finish: 'white', glass: 'clear', hardware: 'brass' };
-    var cfgLabels = {
-      model: { classic2: 'Классика · 2 филёнки', classic3: 'Классика · 3 филёнки', smooth: 'Гладкая современная', glass: 'Со стеклом' },
-      finish: { white: 'эмаль «белая»', blue: 'эмаль «голубая»', olive: 'эмаль «олива»', graphite: 'эмаль «графит»', oak: 'шпон дуба' },
-      glass: { clear: 'прозрачное стекло', satin: 'стекло сатин', reeded: 'рифлёное стекло' },
-      hardware: { brass: 'латунь', chrome: 'хром', black: 'чёрная матовая фурнитура' }
+    var cfg = {
+      type: 'swing', model: 'dg3', height: 'std', transom: 'none',
+      finish: 'white', patina: 'none', glass: 'clear', hardware: 'brass',
+      hinges: 'std', wall: 'cream'
     };
-    var leafFills = { white: '#F2F0EB', blue: '#7C99B4', olive: '#5F6B4F', graphite: '#3A3D40', oak: 'url(#wood-oak)' };
-    var mouldStrokes = { white: '#CFC9BF', blue: '#5E7C97', olive: '#48533D', graphite: '#232528', oak: '#654A32' };
-    var hwFills = { brass: '#B08D57', chrome: '#C9CDD1', black: '#2B2B2B' };
-    var glassFills = { clear: '#CFE0E6', satin: '#E6EAEA', reeded: '#D7E2E4' };
+
+    var L = {
+      type: { swing: 'распашная', double: 'двустворчатая', sliding: 'раздвижная' },
+      model: { dg2: 'Классика ДГ2', dg3: 'Классика ДГ3', palazzo: 'Палаццо', modern: 'Модерн (гладкая)', country: 'Кантри ДО со стеклом', hidden: 'дверь-невидимка' },
+      height: { std: 'высота 2000 мм', h2300: 'высота 2300 мм', ceiling: 'под потолок (до 2600 мм)' },
+      transom: { none: 'без фрамуги', glass: 'фрамуга со стеклом' },
+      finish: { white: 'эмаль белая RAL 9003', ivory: 'эмаль слоновая кость RAL 9010', grey: 'эмаль светло-серая RAL 7044', blue: 'эмаль голубая (NCS)', olive: 'эмаль олива (NCS)', graphite: 'эмаль графит', black: 'эмаль чёрная RAL 9005', oak: 'натуральный шпон дуба', oakgrey: 'дуб серый брашированный', alder: 'массив ольхи' },
+      patina: { none: 'без патины', silver: 'патина серебро', gold: 'патина золото' },
+      glass: { clear: 'прозрачное осветлённое', satin: 'сатин', reeded: 'рифлёное', facet: 'с фацетом', stopsol: 'StopSol зеркальное' },
+      hardware: { brass: 'латунь состаренная', gold: 'золото', chrome: 'хром', black: 'чёрная матовая' },
+      hinges: { std: 'обычные петли', hidden: 'скрытые петли' }
+    };
+
+    var FILL = { white: '#F2F0EB', ivory: '#F1EDE0', grey: '#C6C3BC', blue: '#7C99B4', olive: '#6B7159', graphite: '#3A3D40', black: '#1F1F21', oak: 'url(#wood-oak)', oakgrey: 'url(#wood-oakgrey)', alder: 'url(#wood-alder)' };
+    var MOULD = { white: '#CFC9BF', ivory: '#D6CFBC', grey: '#A8A49C', blue: '#5E7C97', olive: '#545A46', graphite: '#232528', black: '#0E0E10', oak: '#654A32', oakgrey: '#6E6862', alder: '#9A6F4B' };
+    var PATINA = { silver: '#C7C9CC', gold: '#C9A96B' };
+    var GLASS = { clear: '#CFE0E6', satin: '#E6EAEA', reeded: '#D7E2E4', facet: '#D3E4E9', stopsol: '#B3A48C' };
+    var HW = { brass: '#B08D57', gold: '#C9A227', chrome: '#C9CDD1', black: '#2B2B2B' };
+    var WALL = { cream: '#E6E0D6', blue: '#4E7396', olive: '#6F7462' };
+
+    var scene = document.getElementById('door-scene');
+
+    var panelSvg = function (x, y, w, h, mould) {
+      return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="rgba(0,0,0,.055)" stroke="' + mould + '" stroke-width="2.6"/>' +
+        '<rect x="' + (x + 7) + '" y="' + (y + 7) + '" width="' + (w - 14) + '" height="' + (h - 14) + '" fill="none" stroke="' + mould + '" stroke-width="1.2"/>';
+    };
+
+    var glassSvg = function (x, y, w, h, mould, kind, grid) {
+      var s = '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + GLASS[kind] + '" stroke="' + mould + '" stroke-width="2.4"/>';
+      if (kind === 'reeded') {
+        for (var rx = x + 6; rx < x + w - 3; rx += 7) s += '<line x1="' + rx + '" y1="' + y + '" x2="' + rx + '" y2="' + (y + h) + '" stroke="rgba(255,255,255,.4)" stroke-width="1.4"/>';
+      }
+      if (kind === 'facet') {
+        s += '<rect x="' + (x + 6) + '" y="' + (y + 6) + '" width="' + (w - 12) + '" height="' + (h - 12) + '" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.6"/>';
+      }
+      if (kind === 'stopsol' || kind === 'clear') {
+        s += '<line x1="' + (x + w * 0.2) + '" y1="' + (y + h * 0.85) + '" x2="' + (x + w * 0.62) + '" y2="' + (y + h * 0.12) + '" stroke="rgba(255,255,255,.45)" stroke-width="5"/>';
+      }
+      if (grid) {
+        var rows = Math.max(3, Math.round(h / 92));
+        var g = '<g stroke="' + mould + '" stroke-width="2.2">';
+        g += '<line x1="' + (x + w / 2) + '" y1="' + y + '" x2="' + (x + w / 2) + '" y2="' + (y + h) + '"/>';
+        for (var i = 1; i < rows; i++) {
+          var gy = y + (h / rows) * i;
+          g += '<line x1="' + x + '" y1="' + gy + '" x2="' + (x + w) + '" y2="' + gy + '"/>';
+        }
+        s += g + '</g>';
+      }
+      return s;
+    };
+
+    var herringboneSvg = function (x, y, w, h, mould) {
+      var s = '<clipPath id="hb-clip"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/></clipPath>';
+      s += '<g clip-path="url(#hb-clip)" stroke="' + mould + '" stroke-width="1.1" opacity=".55">';
+      var band = 46;
+      for (var by = y, dir = 1; by < y + h; by += band, dir *= -1) {
+        for (var lx = -band; lx < w + band; lx += 11) {
+          var x1 = x + lx, y1 = dir > 0 ? by + band : by, y2 = dir > 0 ? by : by + band;
+          s += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + (x1 + band) + '" y2="' + y2 + '"/>';
+        }
+      }
+      return s + '</g>';
+    };
+
+    var leafSvg = function (x, top, w, model, mould, hingeSide) {
+      var bottom = 600, h = bottom - top;
+      var s = '<rect x="' + x + '" y="' + top + '" width="' + w + '" height="' + h + '" fill="' + FILL[cfg.finish] + '" stroke="rgba(0,0,0,.22)" stroke-width="1.6"/>';
+      s += '<rect x="' + (x + w - 5) + '" y="' + top + '" width="5" height="' + h + '" fill="rgba(0,0,0,.08)"/>';
+      var m = Math.max(20, Math.round(w * 0.16));
+      var px = x + m, pw = w - 2 * m, pt = top + 34, ph = h - 68;
+      if (model === 'dg2') {
+        var h1 = Math.round(ph * 0.52);
+        s += panelSvg(px, pt, pw, h1, mould);
+        s += panelSvg(px, pt + h1 + 20, pw, ph - h1 - 20, mould);
+      } else if (model === 'dg3') {
+        var a = Math.round(ph * 0.34), b = Math.round(ph * 0.2);
+        s += panelSvg(px, pt, pw, a, mould);
+        s += panelSvg(px, pt + a + 16, pw, b, mould);
+        s += panelSvg(px, pt + a + b + 32, pw, ph - a - b - 32, mould);
+      } else if (model === 'palazzo') {
+        s += panelSvg(px, pt, pw, ph, mould);
+        s += herringboneSvg(px + 10, pt + 10, pw - 20, ph - 20, mould);
+      } else if (model === 'country') {
+        s += glassSvg(px, pt, pw, ph, mould, cfg.glass, true);
+      }
+      if (cfg.hinges === 'std' && hingeSide && cfg.type !== 'sliding' && model !== 'hidden') {
+        var hx = hingeSide === 'left' ? x - 2 : x + w - 3;
+        [top + h * 0.14, top + h * 0.5, top + h * 0.86].forEach(function (hy) {
+          s += '<rect x="' + hx + '" y="' + (hy - 10) + '" width="5" height="20" rx="1.5" fill="' + HW[cfg.hardware] + '" stroke="rgba(0,0,0,.25)" stroke-width=".6"/>';
+        });
+      }
+      return s;
+    };
+
+    var handleSvg = function (cx, cy) {
+      return '<circle cx="' + cx + '" cy="' + cy + '" r="6" fill="' + HW[cfg.hardware] + '"/>' +
+        '<rect x="' + (cx - 30) + '" y="' + (cy - 4) + '" width="30" height="8" rx="4" fill="' + HW[cfg.hardware] + '" stroke="rgba(0,0,0,.2)" stroke-width=".6"/>';
+    };
 
     var renderDoor = function () {
-      var leaf = document.getElementById('d-leaf');
-      var frame = document.getElementById('d-frame');
-      leaf.setAttribute('fill', leafFills[cfg.finish]);
-      frame.setAttribute('fill', leafFills[cfg.finish]);
-      ['classic2', 'classic3', 'glass'].forEach(function (id) {
-        var g = document.getElementById('d-model-' + id);
-        if (g) g.style.display = (cfg.model === id) ? '' : 'none';
-      });
-      document.getElementById('d-model-classic2').setAttribute('stroke', mouldStrokes[cfg.finish]);
-      document.getElementById('d-model-classic3').setAttribute('stroke', mouldStrokes[cfg.finish]);
-      document.getElementById('d-glass-grid').setAttribute('stroke', mouldStrokes[cfg.finish]);
-      document.getElementById('d-glass').setAttribute('fill', glassFills[cfg.glass]);
-      document.getElementById('d-lever').setAttribute('fill', hwFills[cfg.hardware]);
-      document.getElementById('d-rosette').setAttribute('fill', hwFills[cfg.hardware]);
-      document.getElementById('copt-glass').hidden = (cfg.model !== 'glass');
-      var parts = [cfgLabels.model[cfg.model], cfgLabels.finish[cfg.finish]];
-      if (cfg.model === 'glass') parts.push(cfgLabels.glass[cfg.glass]);
-      parts.push(cfgLabels.hardware[cfg.hardware]);
+      var mould = (cfg.patina !== 'none' && cfg.model !== 'modern' && cfg.model !== 'hidden') ? PATINA[cfg.patina] : MOULD[cfg.finish];
+      var isHiddenModel = cfg.model === 'hidden';
+      var type = isHiddenModel ? 'swing' : cfg.type;
+      var topY = cfg.height === 'std' ? 150 : (cfg.height === 'h2300' ? 88 : 30);
+      var hasTransom = cfg.transom === 'glass' && type !== 'sliding' && !isHiddenModel;
+      var leafTop = hasTransom ? topY + 74 : topY;
+      var doorX, doorW;
+      if (type === 'double') { doorX = 68; doorW = 224; }
+      else if (type === 'sliding') { doorX = 86; doorW = 188; }
+      else { doorX = 96; doorW = 168; }
+
+      var s = '';
+      s += '<rect x="0" y="0" width="360" height="640" fill="' + WALL[cfg.wall] + '"/>';
+      s += '<rect x="0" y="576" width="360" height="24" fill="#EDEAE3"/>';
+      s += '<rect x="0" y="600" width="360" height="40" fill="#C7AD8B"/>';
+      s += '<line x1="90" y1="600" x2="80" y2="640" stroke="#B79C79" stroke-width="1.4"/><line x1="200" y1="600" x2="196" y2="640" stroke="#B79C79" stroke-width="1.4"/><line x1="300" y1="600" x2="308" y2="640" stroke="#B79C79" stroke-width="1.4"/>';
+      s += '<ellipse cx="180" cy="604" rx="' + (doorW / 2 + 26) + '" ry="8" fill="rgba(0,0,0,.13)"/>';
+
+      if (type !== 'sliding' && !isHiddenModel) {
+        var cx1 = doorX - 16, cx2 = doorX + doorW + 16, cyT = topY - 16;
+        s += '<path d="M' + cx1 + ' 600 V' + cyT + ' H' + cx2 + ' V600 H' + (cx2 - 16) + ' V' + topY + ' H' + (cx1 + 16) + ' V600 Z" fill="' + FILL[cfg.finish] + '" stroke="rgba(0,0,0,.22)" stroke-width="1.4"/>';
+      }
+      if (hasTransom) {
+        s += glassSvg(doorX + 6, topY + 6, doorW - 12, 60, mould, cfg.glass, cfg.model === 'country');
+        s += '<rect x="' + doorX + '" y="' + (topY + 66) + '" width="' + doorW + '" height="8" fill="' + FILL[cfg.finish] + '" stroke="rgba(0,0,0,.2)" stroke-width="1"/>';
+      }
+      if (type === 'sliding') {
+        s += '<rect x="' + (doorX - 38) + '" y="' + (leafTop - 22) + '" width="' + (doorW + 76) + '" height="9" rx="2" fill="#2B2B2B"/>';
+        s += '<circle cx="' + (doorX + 20) + '" cy="' + (leafTop - 10) + '" r="7" fill="#2B2B2B"/><circle cx="' + (doorX + doorW - 20) + '" cy="' + (leafTop - 10) + '" r="7" fill="#2B2B2B"/>';
+      }
+      if (isHiddenModel) {
+        s += '<rect x="' + (doorX - 3) + '" y="' + (leafTop - 3) + '" width="' + (doorW + 6) + '" height="' + (600 - leafTop + 3) + '" fill="none" stroke="rgba(0,0,0,.3)" stroke-width="2"/>';
+        s += leafSvg(doorX, leafTop, doorW, 'modern', mould, null);
+        s += '<rect x="' + (doorX + doorW - 14) + '" y="' + (leafTop + (600 - leafTop) * 0.46) + '" width="5" height="52" rx="2.5" fill="' + HW[cfg.hardware] + '"/>';
+      } else if (type === 'double') {
+        var lw = doorW / 2;
+        s += leafSvg(doorX, leafTop, lw - 1, cfg.model, mould, 'left');
+        s += leafSvg(doorX + lw + 1, leafTop, lw - 1, cfg.model, mould, 'right');
+        var hy = leafTop + (600 - leafTop) * 0.52;
+        s += handleSvg(doorX + lw - 14, hy);
+        s += '<g transform="translate(360,0) scale(-1,1)">' + handleSvg(360 - (doorX + lw + 14), hy) + '</g>';
+      } else if (type === 'sliding') {
+        s += leafSvg(doorX, leafTop, doorW, cfg.model, mould, null);
+        s += '<rect x="' + (doorX + doorW - 16) + '" y="' + (leafTop + (600 - leafTop) * 0.44) + '" width="6" height="56" rx="3" fill="' + HW[cfg.hardware] + '"/>';
+      } else {
+        s += leafSvg(doorX, leafTop, doorW, cfg.model, mould, 'left');
+        s += handleSvg(doorX + doorW - 20, leafTop + (600 - leafTop) * 0.52);
+      }
+      scene.innerHTML = s;
+
+      document.getElementById('copt-patina').hidden = (cfg.model === 'modern' || cfg.model === 'hidden');
+      document.getElementById('copt-glass').hidden = !(cfg.model === 'country' || hasTransom);
+      document.getElementById('copt-transom').hidden = (cfg.type === 'sliding' || cfg.model === 'hidden');
+      document.getElementById('copt-hinges').hidden = (cfg.type === 'sliding' || cfg.model === 'hidden');
+
+      var parts = [L.model[cfg.model], L.type[cfg.type === 'sliding' || cfg.type === 'double' ? cfg.type : 'swing'], L.finish[cfg.finish]];
+      if (cfg.patina !== 'none' && !document.getElementById('copt-patina').hidden) parts.push(L.patina[cfg.patina]);
+      if (!document.getElementById('copt-glass').hidden) parts.push('стекло: ' + L.glass[cfg.glass]);
+      if (hasTransom) parts.push(L.transom.glass);
+      parts.push(L.height[cfg.height], L.hardware[cfg.hardware]);
       document.getElementById('constructor-caption').textContent = parts.join(' · ');
     };
 
     var cfgText = function () {
-      var parts = ['Конфигурация двери с сайта HomePorte:', 'Модель: ' + cfgLabels.model[cfg.model], 'Отделка: ' + cfgLabels.finish[cfg.finish]];
-      if (cfg.model === 'glass') parts.push('Стекло: ' + cfgLabels.glass[cfg.glass]);
-      parts.push('Фурнитура: ' + cfgLabels.hardware[cfg.hardware]);
-      parts.push('Хочу узнать стоимость.');
-      return parts.join('\n');
+      var lines = ['Конфигурация двери с сайта HomePorte:',
+        'Модель: ' + L.model[cfg.model],
+        'Тип: ' + L.type[cfg.model === 'hidden' ? 'swing' : cfg.type],
+        'Высота: ' + L.height[cfg.height],
+        'Отделка: ' + L.finish[cfg.finish]];
+      if (cfg.patina !== 'none' && cfg.model !== 'modern' && cfg.model !== 'hidden') lines.push('Патина: ' + L.patina[cfg.patina]);
+      if (cfg.model === 'country' || (cfg.transom === 'glass' && cfg.type !== 'sliding' && cfg.model !== 'hidden')) lines.push('Стекло: ' + L.glass[cfg.glass]);
+      if (cfg.transom === 'glass' && cfg.type !== 'sliding' && cfg.model !== 'hidden') lines.push('Фрамуга: со стеклом');
+      lines.push('Фурнитура: ' + L.hardware[cfg.hardware]);
+      if (cfg.type !== 'sliding' && cfg.model !== 'hidden') lines.push('Петли: ' + L.hinges[cfg.hinges]);
+      lines.push('Хочу узнать стоимость.');
+      return lines.join('\n');
     };
 
     constructorEl.querySelectorAll('.copt').forEach(function (group) {
@@ -531,6 +672,14 @@
           group.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('is-on', c === chip); });
           renderDoor();
         });
+      });
+    });
+
+    constructorEl.querySelectorAll('.wallchip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        cfg.wall = chip.getAttribute('data-wall');
+        constructorEl.querySelectorAll('.wallchip').forEach(function (c) { c.classList.toggle('is-on', c === chip); });
+        renderDoor();
       });
     });
 
@@ -547,7 +696,6 @@
 
     renderDoor();
   }
-
   /* ---------- Exit-попап с гайдом ---------- */
   var exitOffer = document.getElementById('exit-offer');
   if (exitOffer && typeof exitOffer.showModal === 'function' && hoverCapable) {
