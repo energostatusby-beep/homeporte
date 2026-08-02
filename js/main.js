@@ -2,6 +2,13 @@
   'use strict';
 
   var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hoverCapable = window.matchMedia('(hover: hover)').matches;
+
+  /* меняет текст кнопки, не разрушая обёртку .btn__label */
+  var setBtnLabel = function (btn, text) {
+    var label = btn.querySelector('.btn__label');
+    if (label) { label.textContent = text; } else { btn.textContent = text; }
+  };
 
   /* ---------- Hero-слайдер ---------- */
   var hero = document.querySelector('.hero');
@@ -29,8 +36,12 @@
       });
 
       var goTo = function (index) {
-        slides[current].classList.remove('is-active');
-        slides[current].setAttribute('aria-hidden', 'true');
+        var prev = slides[current];
+        prev.classList.remove('is-active');
+        prev.setAttribute('aria-hidden', 'true');
+        /* уходящий кадр остаётся под «дверью», пока она раскрывается */
+        prev.classList.add('is-prev');
+        setTimeout(function () { prev.classList.remove('is-prev'); }, 1000);
         dots[current].classList.remove('is-active');
         dots[current].removeAttribute('aria-current');
         current = (index + slides.length) % slides.length;
@@ -242,12 +253,21 @@
     var mailLink = document.getElementById('quiz-mail');
     var stepIndex = 0;
 
+    var quizBar = document.getElementById('quiz-bar');
+
     var showStep = function (i) {
       stepIndex = i;
-      steps.forEach(function (s, k) { s.hidden = (k !== i); });
+      steps.forEach(function (s, k) {
+        s.hidden = (k !== i);
+        s.classList.remove('step-in');
+      });
+      /* перезапуск анимации входа шага */
+      void steps[i].offsetWidth;
+      steps[i].classList.add('step-in');
       progress.textContent = 'Шаг ' + (i + 1) + ' из ' + steps.length;
+      if (quizBar) quizBar.style.width = ((i + 1) / steps.length * 100) + '%';
       backBtn.hidden = (i === 0);
-      nextBtn2.textContent = (i === steps.length - 1) ? 'Готово' : 'Далее';
+      setBtnLabel(nextBtn2, (i === steps.length - 1) ? 'Готово' : 'Далее');
     };
 
     var fieldValue = function (name) {
@@ -286,6 +306,7 @@
       steps.forEach(function (s) { s.hidden = true; });
       quizNav.hidden = true;
       progress.textContent = 'Заявка сформирована';
+      if (quizBar) quizBar.style.width = '100%';
       result.hidden = false;
     });
 
@@ -323,6 +344,138 @@
         encodeURIComponent('Заявка с сайта HomePorte') +
         '&body=' + encodeURIComponent(qfText());
     });
+  }
+
+  /* ---------- Кнопки: обёртка текста, magnetic hover, ripple ---------- */
+  document.querySelectorAll('.btn').forEach(function (btn) {
+    if (!btn.querySelector('.btn__label')) {
+      var label = document.createElement('span');
+      label.className = 'btn__label';
+      while (btn.firstChild) label.appendChild(btn.firstChild);
+      btn.appendChild(label);
+    }
+    if (!prefersReducedMotion && hoverCapable) {
+      btn.addEventListener('mousemove', function (e) {
+        var r = btn.getBoundingClientRect();
+        btn.style.setProperty('--tx', ((e.clientX - r.left - r.width / 2) * 0.18) + 'px');
+        btn.style.setProperty('--ty', ((e.clientY - r.top - r.height / 2) * 0.3) + 'px');
+      });
+      btn.addEventListener('mouseleave', function () {
+        btn.style.setProperty('--tx', '0px');
+        btn.style.setProperty('--ty', '0px');
+      });
+    }
+    btn.addEventListener('click', function (e) {
+      if (prefersReducedMotion) return;
+      var r = btn.getBoundingClientRect();
+      var rip = document.createElement('span');
+      rip.className = 'btn__ripple';
+      var size = Math.max(r.width, r.height) * 2;
+      rip.style.width = rip.style.height = size + 'px';
+      rip.style.left = (e.clientX - r.left - size / 2) + 'px';
+      rip.style.top = (e.clientY - r.top - size / 2) + 'px';
+      btn.appendChild(rip);
+      setTimeout(function () { rip.remove(); }, 700);
+    });
+  });
+
+  /* ---------- Заголовки: появление по словам ---------- */
+  if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+    var splitTargets = document.querySelectorAll('.hero__title, .section-head__title');
+    splitTargets.forEach(function (el) {
+      var text = el.textContent.trim();
+      el.setAttribute('aria-label', text);
+      el.textContent = '';
+      text.split(/\s+/).forEach(function (word, i) {
+        var s = document.createElement('span');
+        s.className = 'w';
+        s.setAttribute('aria-hidden', 'true');
+        s.style.setProperty('--wi', i);
+        s.textContent = word;
+        el.appendChild(s);
+        el.appendChild(document.createTextNode(' '));
+      });
+    });
+    var wordsObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('words-in');
+          wordsObserver.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.35 });
+    splitTargets.forEach(function (el) { wordsObserver.observe(el); });
+  }
+
+  /* ---------- Reveal: карточки и фото появляются со stagger ---------- */
+  if (!prefersReducedMotion && 'IntersectionObserver' in window) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          en.target.classList.add('in-view');
+          revealObserver.unobserve(en.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll(
+      '.dir, .gcard, .process__step, .material, .project, .review, .faq__item, .about__photo, .showroom, .socials, .quiz__card, .quickform'
+    ).forEach(function (el) {
+      var idx = el.parentElement ? Array.prototype.indexOf.call(el.parentElement.children, el) : 0;
+      el.style.setProperty('--ri', Math.max(0, idx % 8));
+      el.classList.add('reveal');
+      revealObserver.observe(el);
+    });
+  }
+
+  /* ---------- Счётчики цифр «накручиваются» от нуля ---------- */
+  var factNums = document.querySelectorAll('.fact__num');
+  if (factNums.length && !prefersReducedMotion && 'IntersectionObserver' in window) {
+    var animateNumber = function (el) {
+      var match = el.textContent.match(/^([\d\s\u00a0]+)(.*)$/);
+      if (!match) return;
+      var target = parseInt(match[1].replace(/[\s\u00a0]/g, ""), 10);
+      var suffix = match[2] || '';
+      if (!target) return;
+      var format = function (n) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0");
+      };
+      var startTs = null;
+      var DURATION = 1400;
+      var tick = function (ts) {
+        if (!startTs) startTs = ts;
+        var p = Math.min((ts - startTs) / DURATION, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = format(Math.round(target * eased)) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    var numObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          animateNumber(en.target);
+          numObserver.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.6 });
+    factNums.forEach(function (el) { numObserver.observe(el); });
+  }
+
+  /* ---------- Параллакс фона hero ---------- */
+  if (!prefersReducedMotion && hero) {
+    var slidesWrap = hero.querySelector('.hero__slides');
+    var parallaxTicking = false;
+    window.addEventListener('scroll', function () {
+      if (parallaxTicking || !slidesWrap) return;
+      parallaxTicking = true;
+      requestAnimationFrame(function () {
+        var y = window.scrollY;
+        if (y <= window.innerHeight * 1.2) {
+          slidesWrap.style.transform = 'translateY(' + (y * 0.35) + 'px)';
+        }
+        parallaxTicking = false;
+      });
+    }, { passive: true });
   }
 
   /* ---------- Год в копирайте обновляется сам ---------- */
