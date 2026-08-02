@@ -212,11 +212,14 @@ section { scroll-margin-top: var(--header-h); }
   color: var(--white);
 }
 
-/* ---------- Карточки ---------- */
+/* ---------- Карточки: латунная кромка вместо тени ---------- */
 .card {
   background: var(--white);
-  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(176, 141, 87, .25);
 }
+
+/* фирменное выделение текста */
+::selection { background: var(--brass); color: #1a1a1a; }
 
 /* ---------- Шапка ---------- */
 .header {
@@ -245,6 +248,7 @@ section { scroll-margin-top: var(--header-h); }
   font-size: 1.35rem;
   font-weight: 200;
   letter-spacing: .18em;
+  white-space: nowrap;
   color: var(--white);
   transition: color .3s ease;
 }
@@ -266,10 +270,16 @@ section { scroll-margin-top: var(--header-h); }
   font-weight: 600;
   letter-spacing: .14em;
   text-transform: uppercase;
+  white-space: nowrap;
   color: var(--white);
   padding: 6px 0;
   border-bottom: 1px solid transparent;
   transition: color .25s ease, border-color .25s ease;
+}
+
+@media (max-width: 1120px) {
+  .nav { gap: 15px; }
+  .nav__link { font-size: .75rem; letter-spacing: .1em; }
 }
 .nav__link:hover,
 .nav__link.is-active {
@@ -445,7 +455,7 @@ body.menu-open { overflow: hidden; }
   object-fit: cover;
 }
 
-/* затемнение для читаемости текста */
+/* тёплое «свечное» затемнение + виньетка */
 .hero__slide::after {
   content: "";
   position: absolute;
@@ -453,7 +463,29 @@ body.menu-open { overflow: hidden; }
   right: 0;
   bottom: 0;
   left: 0;
-  background: linear-gradient(180deg, rgba(17,17,17,.35) 0%, rgba(17,17,17,.45) 55%, rgba(17,17,17,.62) 100%);
+  background:
+    radial-gradient(120% 95% at 50% 42%, transparent 52%, rgba(24, 16, 10, .42) 100%),
+    linear-gradient(180deg, rgba(26, 18, 12, .34) 0%, rgba(26, 18, 12, .44) 55%, rgba(26, 18, 12, .62) 100%);
+}
+
+/* кинематографичный медленный наезд внутри слайда */
+.hero__slide.is-active .hero__img {
+  animation: kenburns 9s ease-out both;
+}
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.07); }
+}
+
+/* плёночное зерно поверх фото */
+.hero__grain {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: url("../assets/img/texture/concrete.svg");
+  background-size: 420px 420px;
+  opacity: .5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 
 .hero__content {
@@ -603,6 +635,41 @@ html:not(.js) .burger { display: none; }
   margin-bottom: clamp(36px, 6vw, 72px);
 }
 
+/* латунный индекс секции и hairline-линия до края */
+main { counter-reset: sec; }
+.section { counter-increment: sec; }
+.section-head__title::before {
+  content: counter(sec, decimal-leading-zero);
+  display: block;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  letter-spacing: .14em;
+  color: var(--brass);
+  margin-bottom: 4px;
+}
+.section-head::after {
+  content: "";
+  flex: 1 1 40px;
+  height: 1px;
+  background: rgba(176, 141, 87, .35);
+  align-self: center;
+}
+
+/* арка-глиф перед итальянскими фразами */
+.section-head__accent::before {
+  content: "";
+  display: inline-block;
+  width: .5em;
+  height: .58em;
+  border: 1.5px solid currentColor;
+  border-bottom: none;
+  border-radius: 999px 999px 0 0;
+  margin-right: .4em;
+  vertical-align: baseline;
+}
+
 .section-head__title {
   font-size: clamp(2.4rem, 6.8vw, 5.3rem);
   font-weight: 200;
@@ -636,11 +703,19 @@ html:not(.js) .burger { display: none; }
   margin-top: clamp(28px, 4vw, 48px);
 }
 
-.fact { display: flex; flex-direction: column; gap: 2px; }
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-top: 1px solid rgba(176, 141, 87, .45);
+  padding-top: 12px;
+}
 
 .fact__num {
-  font-size: clamp(2.1rem, 3.8vw, 3.3rem);
-  font-weight: 200;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(2.3rem, 4vw, 3.6rem);
   line-height: 1.1;
 }
 
@@ -749,9 +824,43 @@ html:not(.js) .burger { display: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform .45s ease;
+  /* единый тёплый грейдинг «плёнки ателье»; на hover фото оживает */
+  filter: sepia(.08) saturate(.94) contrast(1.04);
+  transition: transform .45s ease, filter .45s ease;
 }
-.gcard:hover .gcard__link img { transform: scale(1.04); }
+.gcard:hover .gcard__link img { transform: scale(1.04); filter: none; }
+
+/* ритм лукбука: якорный кадр и широкая фактурная вставка */
+.gallery__grid { grid-auto-flow: dense; }
+.gallery__grid > li:first-child { grid-column: span 2; grid-row: span 2; }
+.gallery__grid > li:last-child { grid-column: span 2; }
+.gallery__grid > li:first-child,
+.gallery__grid > li:last-child { display: flex; flex-direction: column; }
+.gallery__grid > li:first-child .gcard__link,
+.gallery__grid > li:last-child .gcard__link {
+  aspect-ratio: auto;
+  flex: 1;
+  min-height: 0;
+}
+.gallery__grid > li:last-child .gcard__link { min-height: 220px; }
+
+/* арочные маски-порталы на части кадров */
+.gallery__grid > li:nth-child(even):not(:last-child) .gcard__link {
+  border-radius: 999px 999px 0 0;
+}
+/* тонкий внутренний контур-арка на ховере */
+.gcard__link::before {
+  content: "";
+  position: absolute;
+  top: 10px; right: 10px; bottom: 10px; left: 10px;
+  border: 1px solid var(--accent-bright);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity .35s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.gcard:hover .gcard__link::before { opacity: .75; }
 
 .gcard__caption {
   text-align: center;
@@ -928,13 +1037,42 @@ html:not(.js) .burger { display: none; }
   box-shadow: var(--shadow-card-hover);
 }
 
+/* номер шага — гравированная латунная табличка, как на дверях отелей */
 .process__num {
-  display: block;
-  font-size: clamp(1.8rem, 2.6vw, 2.4rem);
-  font-weight: 200;
-  color: var(--accent);
-  margin-bottom: 10px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 38px;
+  padding: 0 14px;
+  background: linear-gradient(160deg, #C9A76B, #B08D57 55%, #8F6F42);
+  color: #2B1F12;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  border-radius: 3px;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, .5),
+    inset 0 -1px 1px rgba(0, 0, 0, .28),
+    0 1px 3px rgba(0, 0, 0, .2);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, .35);
+  margin-bottom: 14px;
 }
+.process__num::before,
+.process__num::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(60, 42, 20, .55);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, .4);
+  transform: translateY(-50%);
+}
+.process__num::before { left: 6px; }
+.process__num::after { right: 6px; }
 
 .process__title {
   font-size: 1.02rem;
@@ -948,33 +1086,53 @@ html:not(.js) .burger { display: none; }
   line-height: 1.55;
 }
 
-/* ---------- Материалы ---------- */
+/* ---------- Материалы: тёмный «зелёный кабинет» с латунью ---------- */
+.materials { background: var(--green-deep); }
+.materials .section-head__title { color: #F5F1E7; }
+.materials .section-head__accent { color: var(--brass); }
+.materials .section-head::after { background: rgba(176, 141, 87, .3); }
+.materials :focus-visible { outline-color: #F3E9E3; }
+
 .materials__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(14px, 2vw, 24px);
+  gap: clamp(20px, 3vw, 40px) clamp(20px, 3vw, 44px);
+  counter-reset: mat;
 }
 
 .material {
-  padding: clamp(22px, 2.6vw, 36px);
-  border-top: 3px solid var(--accent);
-  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  background: transparent;
+  border: none;
+  border-top: 1px solid rgba(176, 141, 87, .38);
+  padding: clamp(18px, 2.2vw, 26px) 0 0;
+  counter-increment: mat;
+  transition: border-color .25s ease;
 }
-.material:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-card-hover);
-  border-top-color: var(--brass);
+.material:hover { border-top-color: var(--brass); }
+
+.material::before {
+  content: "0" counter(mat);
+  display: block;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.15rem;
+  letter-spacing: .1em;
+  color: var(--brass);
+  margin-bottom: 10px;
 }
 
 .material__title {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.3rem;
+  font-weight: 300;
+  letter-spacing: .02em;
+  color: #F5F1E7;
   margin-bottom: 8px;
 }
 
 .material__desc {
   font-size: .9rem;
-  color: var(--text-muted);
+  color: rgba(240, 235, 224, .62);
   line-height: 1.6;
 }
 
@@ -994,11 +1152,24 @@ html:not(.js) .burger { display: none; }
   box-shadow: var(--shadow-card-hover);
 }
 
+.project__media {
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+}
 .project__img {
   width: 100%;
-  aspect-ratio: 16 / 10;
+  height: 100%;
   object-fit: cover;
+  filter: sepia(.08) saturate(.94) contrast(1.04);
+  transition: filter .45s ease;
 }
+.project:hover .project__img { filter: none; }
+/* крупный план створки — тот же кадр читается как новая съёмка */
+.project__img--detail {
+  transform: scale(1.6);
+  transform-origin: 70% 55%;
+}
+.project__img--bottom { object-position: 50% 100%; }
 
 .project__body { padding: clamp(20px, 2.4vw, 30px); }
 
@@ -1232,6 +1403,73 @@ html:not(.js) .quiz__step[hidden] { display: block; }
   max-width: 68ch;
 }
 
+/* ---------- Интерлюдия: фактура дуба на весь экран ---------- */
+.interlude {
+  position: relative;
+  height: clamp(320px, 52vh, 540px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.interlude__img {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+  filter: sepia(.12) saturate(.9) contrast(1.05);
+}
+.interlude__veil {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: linear-gradient(180deg, rgba(26, 18, 12, .52), rgba(143, 69, 38, .3) 55%, rgba(26, 18, 12, .58));
+}
+.interlude__line {
+  position: relative;
+  text-align: center;
+  color: #F6F1E8;
+  padding: 0 var(--pad);
+}
+.interlude__it {
+  display: block;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+}
+.interlude__ru {
+  display: block;
+  margin-top: 12px;
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: rgba(246, 241, 232, .72);
+}
+
+/* ---------- Латунная линия прогресса скролла ---------- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--brass));
+  z-index: 60;
+  pointer-events: none;
+}
+
+/* ---------- Логотип: арка вместо «O» ---------- */
+.logo__arch {
+  height: .74em;
+  width: auto;
+  display: inline-block;
+  vertical-align: baseline;
+  margin: 0 .06em;
+}
+
 /* ---------- Плавающая кнопка Instagram ---------- */
 .fab {
   position: fixed;
@@ -1431,6 +1669,7 @@ body.lightbox-open { overflow: hidden; }
   .process__steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .materials__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .projects__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .interlude { height: clamp(280px, 42vh, 420px); }
 }
 
 @media (max-width: 860px) {
@@ -1441,21 +1680,23 @@ body.lightbox-open { overflow: hidden; }
   .reviews__grid { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 768px) {
-  :root { --header-h: 64px; }
-
+/* 6 пунктов меню не влезают на средних ширинах — бургер раньше */
+@media (max-width: 940px) {
   .nav { display: none; }
   .header__phone { display: none; }
   .burger { display: flex; }
-
-  /* без JS бургер мёртв — показываем обычные якоря */
   html:not(.js) .nav { display: flex; gap: 14px; }
+}
+
+@media (max-width: 768px) {
+  :root { --header-h: 64px; }
 
   .dirs { grid-template-columns: 1fr; }
   .gallery__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .process__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .materials__grid { grid-template-columns: 1fr; }
+  .materials__grid { grid-template-columns: 1fr; gap: 26px; }
   .projects__grid { grid-template-columns: 1fr; }
+  .section-head::after { display: none; }
 
   .fab { display: flex; }
 
@@ -1490,6 +1731,11 @@ body.lightbox-open { overflow: hidden; }
   to   { opacity: 1; transform: none; }
 }
 
+/* фотографии появляются «створками» — фирменный жест бренда */
+.gcard.reveal.in-view,
+.project.reveal.in-view,
+.about__photo.reveal.in-view { animation-name: door-reveal; }
+
 /* появление заголовков по словам */
 .hero__title .w,
 .section-head__title .w {
@@ -1518,10 +1764,13 @@ body.lightbox-open { overflow: hidden; }
 }
 .gcard:hover .gcard__link::after { transform: translateY(0); }
 
-/* ---------- Лайтбокс: fade + scale ---------- */
-.lightbox[open] .lightbox__figure { animation: lb-in .35s ease both; }
-@keyframes lb-in {
-  from { opacity: 0; transform: scale(.94); }
+/* ---------- Лайтбокс открывается «створками», как дверь ---------- */
+.lightbox[open] .lightbox__figure { animation: door-reveal .5s cubic-bezier(.65, .05, .35, 1) both; }
+
+/* единый «дверной» глагол движения для фото и шагов */
+@keyframes door-reveal {
+  from { opacity: 1; clip-path: inset(0 50% 0 50%); }
+  to   { opacity: 1; clip-path: inset(0 0 0 0); }
 }
 .lightbox[open]::backdrop { animation: lb-bg .35s ease both; }
 @keyframes lb-bg {
@@ -1543,11 +1792,7 @@ body.lightbox-open { overflow: hidden; }
   transition: width .45s cubic-bezier(.22, .61, .36, 1);
 }
 
-.quiz__step.step-in { animation: step-in .4s ease both; }
-@keyframes step-in {
-  from { opacity: 0; transform: translateX(26px); }
-  to   { opacity: 1; transform: none; }
-}
+.quiz__step.step-in { animation: door-reveal .45s cubic-bezier(.65, .05, .35, 1) both; }
 
 .quiz__option { position: relative; padding-right: 46px; }
 .quiz__option::after {
@@ -1573,9 +1818,12 @@ body.lightbox-open { overflow: hidden; }
 @media print {
   .header, .side-tab, .fab,
   .hero__arrow, .hero__dots, .hero__scroll-hint,
-  .mobile-menu, .lightbox { display: none !important; }
+  .mobile-menu, .lightbox, .interlude, .scroll-progress, .hero__grain { display: none !important; }
 
   body { background: none; }
+  .materials { background: none; }
+  .materials .section-head__title, .material__title { color: #000; }
+  .material__desc { color: #333; }
   .hero { height: auto; min-height: 0; }
   .hero__slide { position: static; opacity: 1; }
   .hero__slide:not(.is-active) { display: none; }

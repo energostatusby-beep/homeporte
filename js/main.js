@@ -478,6 +478,22 @@
     }, { passive: true });
   }
 
+  /* ---------- Латунная линия прогресса скролла ---------- */
+  var progressBar = document.getElementById('scroll-progress');
+  if (progressBar) {
+    var progressTicking = false;
+    var updateProgress = function () {
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (max > 0 ? (window.scrollY / max) * 100 : 0) + '%';
+    };
+    window.addEventListener('scroll', function () {
+      if (progressTicking) return;
+      progressTicking = true;
+      requestAnimationFrame(function () { updateProgress(); progressTicking = false; });
+    }, { passive: true });
+    updateProgress();
+  }
+
   /* ---------- Год в копирайте обновляется сам ---------- */
   var yearEl = document.getElementById('copyright-year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();

@@ -73,10 +73,12 @@
 </head>
 <body>
 
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+
   <header class="header" id="header">
     <div class="header__inner">
       <a class="logo" href="#top" aria-label="HomePorte — на главную">
-        <span class="logo__name">HOME<b>PORTE</b></span>
+        <span class="logo__name">HOME<b>P<svg class="logo__arch" viewBox="0 0 16 18" aria-hidden="true"><path d="M2.2 17.2 V8.4 a5.8 5.8 0 0 1 11.6 0 V17.2" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>RTE</b></span>
         <span class="logo__tagline" lang="it">porte italiane su misura</span>
       </a>
       <nav class="nav" aria-label="Основная навигация">
@@ -132,9 +134,10 @@
           <img class="hero__img" src="assets/img/hero/hero-2.jpg" alt="Стеновые панели и двери из дуба — кабинет" width="1280" height="852" loading="lazy">
         </div>
         <div class="hero__slide" aria-hidden="true">
-          <img class="hero__img" src="assets/img/hero/hero-3.jpg" alt="Белые двери и стеновые панели в синем коридоре" width="1280" height="852" loading="lazy">
+          <img class="hero__img" src="assets/img/hero/hero-3.jpg" alt="Кабинет с дубовыми стеновыми панелями и красным диваном честерфилд" width="1280" height="852" loading="lazy">
         </div>
       </div>
+      <div class="hero__grain" aria-hidden="true"></div>
       <div class="hero__content">
         <p class="hero__eyebrow"><span lang="it">fatto a mano</span> · семейное производство</p>
         <h1 class="hero__title">Межкомнатные двери собственного производства</h1>
@@ -152,7 +155,7 @@
       </button>
       <div class="hero__dots" role="group" aria-label="Слайды"></div>
       <div class="hero__scroll-hint" aria-hidden="true">
-        <svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2l10 10L22 2"/></svg>
+        <svg viewBox="0 0 20 22" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21 V9 a7 7 0 0 1 14 0 V21"/></svg>
       </div>
     </section>
 
@@ -289,6 +292,16 @@
       </div>
     </section>
 
+    <!-- ═══════════ ИНТЕРЛЮДИЯ: фактура дуба ═══════════ -->
+    <section class="interlude" aria-label="Ручная работа">
+      <img class="interlude__img" src="assets/img/gallery/08.jpg" alt="" width="852" height="1280" loading="lazy" aria-hidden="true">
+      <div class="interlude__veil" aria-hidden="true"></div>
+      <p class="interlude__line">
+        <span class="interlude__it" lang="it">Ogni porta è fatta a mano</span>
+        <span class="interlude__ru">каждая дверь сделана вручную</span>
+      </p>
+    </section>
+
     <!-- ═══════════ ГАЛЕРЕЯ ═══════════ -->
     <section class="section gallery" id="gallery">
       <div class="container">
@@ -378,7 +391,7 @@
         </div>
         <div class="projects__grid">
           <article class="project card">
-            <img class="project__img" src="assets/img/hero/hero-1.jpg" alt="Голубые раздвижные и распашные двери в квартире" width="1280" height="848" loading="lazy">
+            <div class="project__media"><img class="project__img project__img--detail" src="assets/img/hero/hero-1.jpg" alt="Створки голубых раздвижных дверей с латунными ручками — деталь" width="1280" height="848" loading="lazy"></div>
             <div class="project__body">
               <h3 class="project__title">Квартира с голубыми дверями</h3>
               <p class="project__desc">Комплект для всей квартиры: раздвижные двери со стеклянной раскладкой, распашные двери с филёнками и дверь для санузла — всё в одном цвете и стиле.</p>
@@ -390,7 +403,7 @@
             </div>
           </article>
           <article class="project card">
-            <img class="project__img" src="assets/img/hero/hero-2.jpg" alt="Кабинет с панелями и дверями из натурального дуба" width="1280" height="852" loading="lazy">
+            <div class="project__media"><img class="project__img" src="assets/img/projects/oak.jpg" alt="Стена с ТВ-порталом и встроенным шкафом из натурального дуба" width="1280" height="852" loading="lazy"></div>
             <div class="project__body">
               <h3 class="project__title">Кабинет из натурального дуба</h3>
               <p class="project__desc">Стеновые панели по периметру, двери с фрамугами, встроенный шкаф, портал и решётки радиаторов — единый ансамбль из брашированного дуба.</p>
@@ -402,7 +415,7 @@
             </div>
           </article>
           <article class="project card">
-            <img class="project__img" src="assets/img/hero/hero-3.jpg" alt="Белые двери и стеновые панели в офисном коридоре" width="1280" height="852" loading="lazy">
+            <div class="project__media"><img class="project__img project__img--bottom" src="assets/img/projects/office.jpg" alt="Белые двери и стеновые панели в офисном коридоре" width="1280" height="852" loading="lazy"></div>
             <div class="project__body">
               <h3 class="project__title">Офис: белые панели и двери</h3>
               <p class="project__desc">Коридоры и переговорные: двери с фрамугами, скрытые технические двери и стеновые панели в эмали — строгая классика для рабочего пространства.</p>
@@ -638,7 +651,7 @@
   <footer class="footer">
     <div class="container footer__grid">
       <div class="footer__brand">
-        <p class="footer__logo">HOME<b>PORTE</b></p>
+        <p class="footer__logo">HOME<b>P<svg class="logo__arch" viewBox="0 0 16 18" aria-hidden="true"><path d="M2.2 17.2 V8.4 a5.8 5.8 0 0 1 11.6 0 V17.2" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>RTE</b></p>
         <p class="footer__tagline" lang="it">porte italiane su misura</p>
         <ul class="footer__socials">
           <li><a href="https://www.instagram.com/homeporte.by" target="_blank" rel="noopener">Instagram</a></li>
