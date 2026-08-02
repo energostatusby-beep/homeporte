@@ -478,6 +478,101 @@
     }, { passive: true });
   }
 
+  /* ---------- Конфигуратор «Соберите свою дверь» ---------- */
+  var constructorEl = document.getElementById('constructor');
+  if (constructorEl) {
+    var cfg = { model: 'classic2', finish: 'white', glass: 'clear', hardware: 'brass' };
+    var cfgLabels = {
+      model: { classic2: 'Классика · 2 филёнки', classic3: 'Классика · 3 филёнки', smooth: 'Гладкая современная', glass: 'Со стеклом' },
+      finish: { white: 'эмаль «белая»', blue: 'эмаль «голубая»', olive: 'эмаль «олива»', graphite: 'эмаль «графит»', oak: 'шпон дуба' },
+      glass: { clear: 'прозрачное стекло', satin: 'стекло сатин', reeded: 'рифлёное стекло' },
+      hardware: { brass: 'латунь', chrome: 'хром', black: 'чёрная матовая фурнитура' }
+    };
+    var leafFills = { white: '#F2F0EB', blue: '#7C99B4', olive: '#5F6B4F', graphite: '#3A3D40', oak: 'url(#wood-oak)' };
+    var mouldStrokes = { white: '#CFC9BF', blue: '#5E7C97', olive: '#48533D', graphite: '#232528', oak: '#654A32' };
+    var hwFills = { brass: '#B08D57', chrome: '#C9CDD1', black: '#2B2B2B' };
+    var glassFills = { clear: '#CFE0E6', satin: '#E6EAEA', reeded: '#D7E2E4' };
+
+    var renderDoor = function () {
+      var leaf = document.getElementById('d-leaf');
+      var frame = document.getElementById('d-frame');
+      leaf.setAttribute('fill', leafFills[cfg.finish]);
+      frame.setAttribute('fill', leafFills[cfg.finish]);
+      ['classic2', 'classic3', 'glass'].forEach(function (id) {
+        var g = document.getElementById('d-model-' + id);
+        if (g) g.style.display = (cfg.model === id) ? '' : 'none';
+      });
+      document.getElementById('d-model-classic2').setAttribute('stroke', mouldStrokes[cfg.finish]);
+      document.getElementById('d-model-classic3').setAttribute('stroke', mouldStrokes[cfg.finish]);
+      document.getElementById('d-glass-grid').setAttribute('stroke', mouldStrokes[cfg.finish]);
+      document.getElementById('d-glass').setAttribute('fill', glassFills[cfg.glass]);
+      document.getElementById('d-lever').setAttribute('fill', hwFills[cfg.hardware]);
+      document.getElementById('d-rosette').setAttribute('fill', hwFills[cfg.hardware]);
+      document.getElementById('copt-glass').hidden = (cfg.model !== 'glass');
+      var parts = [cfgLabels.model[cfg.model], cfgLabels.finish[cfg.finish]];
+      if (cfg.model === 'glass') parts.push(cfgLabels.glass[cfg.glass]);
+      parts.push(cfgLabels.hardware[cfg.hardware]);
+      document.getElementById('constructor-caption').textContent = parts.join(' · ');
+    };
+
+    var cfgText = function () {
+      var parts = ['Конфигурация двери с сайта HomePorte:', 'Модель: ' + cfgLabels.model[cfg.model], 'Отделка: ' + cfgLabels.finish[cfg.finish]];
+      if (cfg.model === 'glass') parts.push('Стекло: ' + cfgLabels.glass[cfg.glass]);
+      parts.push('Фурнитура: ' + cfgLabels.hardware[cfg.hardware]);
+      parts.push('Хочу узнать стоимость.');
+      return parts.join('\n');
+    };
+
+    constructorEl.querySelectorAll('.copt').forEach(function (group) {
+      var opt = group.getAttribute('data-opt');
+      group.querySelectorAll('.chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          cfg[opt] = chip.getAttribute('data-value');
+          group.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('is-on', c === chip); });
+          renderDoor();
+        });
+      });
+    });
+
+    document.getElementById('constructor-send').addEventListener('click', function () {
+      if (navigator.clipboard) navigator.clipboard.writeText(cfgText()).catch(function () {});
+    });
+
+    document.getElementById('constructor-to-quiz').addEventListener('click', function () {
+      var comment = document.querySelector('#quiz-form [name="comment"]');
+      if (comment) comment.value = cfgText().replace('Конфигурация двери с сайта HomePorte:\n', 'Дверь из конфигуратора — ');
+      var quizSection = document.getElementById('quiz');
+      if (quizSection) quizSection.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+    });
+
+    renderDoor();
+  }
+
+  /* ---------- Exit-попап с гайдом ---------- */
+  var exitOffer = document.getElementById('exit-offer');
+  if (exitOffer && typeof exitOffer.showModal === 'function' && hoverCapable) {
+    var exitShown = false;
+    try { exitShown = sessionStorage.getItem('hp-exit') === '1'; } catch (e) {}
+    var pageOpenedAt = Date.now();
+    document.addEventListener('mouseout', function (e) {
+      if (exitShown || exitOffer.open) return;
+      if (e.relatedTarget) return;
+      if (e.clientY > 12) return;
+      if (Date.now() - pageOpenedAt < 15000) return;
+      exitShown = true;
+      try { sessionStorage.setItem('hp-exit', '1'); } catch (e2) {}
+      exitOffer.showModal();
+      document.body.classList.add('lightbox-open');
+    });
+    var closeExit = function () {
+      document.body.classList.remove('lightbox-open');
+      if (exitOffer.open) exitOffer.close();
+    };
+    exitOffer.querySelector('.exit-offer__close').addEventListener('click', closeExit);
+    exitOffer.addEventListener('close', function () { document.body.classList.remove('lightbox-open'); });
+    exitOffer.addEventListener('click', function (e) { if (e.target === exitOffer) closeExit(); });
+  }
+
   /* ---------- Латунная линия прогресса скролла ---------- */
   var progressBar = document.getElementById('scroll-progress');
   if (progressBar) {

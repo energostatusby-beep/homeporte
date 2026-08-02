@@ -532,6 +532,23 @@ body.menu-open { overflow: hidden; }
   flex-wrap: wrap;
 }
 
+.hero__note {
+  margin-top: 20px;
+  font-size: .82rem;
+  letter-spacing: .06em;
+  color: rgba(255, 255, 255, .78);
+}
+.hero__note::before {
+  content: "";
+  display: inline-block;
+  width: .5em;
+  height: .58em;
+  border: 1.5px solid var(--brass);
+  border-bottom: none;
+  border-radius: 999px 999px 0 0;
+  margin-right: .5em;
+}
+
 .hero__arrow {
   position: absolute;
   top: 50%;
@@ -1217,6 +1234,168 @@ main { counter-reset: sec; }
   color: var(--text-muted);
 }
 
+/* ---------- Полоса доверия над квизом ---------- */
+.trustbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin: -20px 0 34px;
+}
+.trustbar li {
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+}
+.trustbar li::before {
+  content: "";
+  display: inline-block;
+  width: .5em;
+  height: .58em;
+  border: 1.5px solid var(--brass);
+  border-bottom: none;
+  border-radius: 999px 999px 0 0;
+  margin-right: .5em;
+}
+
+/* ---------- Конфигуратор двери ---------- */
+.constructor__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: clamp(20px, 3vw, 44px);
+  align-items: start;
+}
+
+.constructor__preview {
+  padding: clamp(20px, 2.6vw, 34px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: sticky;
+  top: calc(var(--header-h) + 16px);
+}
+.constructor__door { width: 100%; max-width: 300px; height: auto; }
+#d-frame { transition: fill .3s ease; }
+#d-leaf { transition: fill .3s ease; }
+.constructor__caption {
+  margin-top: 14px;
+  font-size: .84rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.constructor__options { display: flex; flex-direction: column; gap: 22px; }
+
+.copt { border: none; margin: 0; padding: 0; }
+.copt legend {
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  padding: 0;
+}
+.copt__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip {
+  padding: 10px 16px;
+  font-size: .85rem;
+  border: 1px solid rgba(0, 0, 0, .18);
+  background: var(--white);
+  cursor: pointer;
+  transition: border-color .2s ease, background-color .2s ease, color .2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.chip:hover { border-color: var(--accent); }
+.chip.is-on {
+  border-color: var(--accent);
+  background: rgba(166, 82, 46, .07);
+  font-weight: 600;
+}
+.chip--swatch::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--sw, #ccc);
+  border: 1px solid rgba(0, 0, 0, .15);
+}
+
+.constructor__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+/* мини-отзыв у формы */
+.quiz__proof {
+  margin: 18px 0 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--brass);
+  background: rgba(255, 255, 255, .55);
+}
+.quiz__proof p {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 1.02rem;
+  margin-bottom: 6px;
+}
+.quiz__proof footer { font-size: .78rem; color: var(--text-muted); }
+.quiz__proof footer a { color: var(--accent); }
+
+/* ---------- Exit-попап с гайдом ---------- */
+.exit-offer {
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-width: min(92vw, 520px);
+}
+.exit-offer::backdrop { background: rgba(12, 12, 12, .55); backdrop-filter: blur(3px); }
+.exit-offer__card {
+  position: relative;
+  background: var(--bg);
+  border-top: 3px solid var(--brass);
+  padding: clamp(28px, 5vw, 44px);
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .35);
+}
+.exit-offer__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+.exit-offer__close svg { width: 18px; height: 18px; }
+.exit-offer__eyebrow {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.exit-offer__title {
+  font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+  font-weight: 300;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.exit-offer__desc {
+  font-size: .92rem;
+  color: var(--text-muted);
+  max-width: 40ch;
+  margin: 0 auto 24px;
+}
+.exit-offer__cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
 /* ---------- Квиз и быстрая форма ---------- */
 .quiz__grid {
   display: grid;
@@ -1229,6 +1408,12 @@ main { counter-reset: sec; }
   padding: clamp(24px, 3.4vw, 48px);
   border: none;
   margin: 0;
+}
+
+.quiz__meta {
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
 }
 
 .quiz__progress {
@@ -1344,7 +1529,27 @@ html:not(.js) .quiz__step[hidden] { display: block; }
   gap: clamp(14px, 2vw, 24px);
 }
 
+.reviews__rating {
+  margin: -14px 0 30px;
+  font-size: .95rem;
+  color: var(--text-muted);
+}
+.reviews__rating strong {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-right: 6px;
+}
+.reviews__rating a { color: var(--accent); border-bottom: 1px solid currentColor; }
+
 .review { padding: clamp(22px, 2.6vw, 34px); margin: 0; }
+.review__head {
+  font-weight: 600;
+  font-size: 1.02rem;
+  margin-bottom: 10px;
+}
 
 .reviews__note {
   margin-top: clamp(20px, 2.6vw, 32px);
@@ -1472,33 +1677,47 @@ html:not(.js) .quiz__step[hidden] { display: block; }
   margin: 0 .06em;
 }
 
-/* ---------- Плавающая кнопка Instagram ---------- */
-.fab {
+/* ---------- Закреплённая панель действий (мобильные) ---------- */
+.sticky-bar {
   position: fixed;
-  right: 18px;
-  bottom: 18px;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 45;
-  width: 56px;
-  height: 56px;
-  background: rgba(17, 17, 17, .74);
-  color: var(--white);
   display: none;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: rgba(20, 16, 12, .88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(176, 141, 87, .35);
+}
+.sticky-bar__cta {
+  flex: 1;
+  text-align: center;
+  padding: 13px 10px;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--white);
+  background: linear-gradient(120deg, rgba(143, 69, 38, .95), rgba(176, 141, 87, .9));
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, .22);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  box-shadow:
-    inset 2px 2px 1px -1px rgba(255, 255, 255, .5),
-    inset -2px -2px 1px -1px rgba(255, 255, 255, .28),
-    0 6px 22px rgba(0, 0, 0, .28);
-  transition: background-color .25s ease, transform .3s ease;
+  white-space: nowrap;
 }
-.fab:hover {
-  background: linear-gradient(135deg, rgba(143, 69, 38, .9), rgba(176, 141, 87, .9));
-  transform: scale(1.06);
+.sticky-bar__ico {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 999px;
 }
+.sticky-bar__ico svg { width: 22px; height: 22px; }
 .fab svg { width: 26px; height: 26px; }
 
 /* ---------- Футер ---------- */
@@ -1680,6 +1899,8 @@ body.lightbox-open { overflow: hidden; }
   .contacts__grid { grid-template-columns: 1fr; }
   .quiz__grid { grid-template-columns: 1fr; }
   .reviews__grid { grid-template-columns: 1fr; }
+  .constructor__grid { grid-template-columns: 1fr; }
+  .constructor__preview { position: static; max-width: 420px; margin: 0 auto; }
 }
 
 /* 6 пунктов меню не влезают на средних ширинах — бургер раньше */
@@ -1700,7 +1921,8 @@ body.lightbox-open { overflow: hidden; }
   .projects__grid { grid-template-columns: 1fr; }
   .section-head::after { display: none; }
 
-  .fab { display: flex; }
+  .sticky-bar { display: flex; }
+  body { padding-bottom: 72px; }
 
   .footer__grid { grid-template-columns: 1fr; gap: 32px; }
 
@@ -1820,7 +2042,8 @@ body.lightbox-open { overflow: hidden; }
 @media print {
   .header, .side-tab, .fab,
   .hero__arrow, .hero__dots, .hero__scroll-hint,
-  .mobile-menu, .lightbox, .interlude, .scroll-progress, .hero__grain { display: none !important; }
+  .mobile-menu, .lightbox, .interlude, .scroll-progress, .hero__grain,
+  .sticky-bar, .exit-offer, .constructor__actions { display: none !important; }
 
   body { background: none; }
   .materials { background: none; }
