@@ -1028,6 +1028,23 @@ main { counter-reset: sec; }
   max-width: 100% !important;
 }
 
+.showroom__note {
+  margin-top: 4px;
+  font-size: .84rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.showroom__note::before {
+  content: "";
+  display: inline-block;
+  width: .5em;
+  height: .58em;
+  border: 1.5px solid var(--brass);
+  border-bottom: none;
+  border-radius: 999px 999px 0 0;
+  margin-right: .5em;
+}
+
 .contacts__note {
   margin-top: 26px;
   font-size: .95rem;
