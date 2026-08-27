@@ -532,23 +532,6 @@ body.menu-open { overflow: hidden; }
   flex-wrap: wrap;
 }
 
-.hero__note {
-  margin-top: 20px;
-  font-size: .82rem;
-  letter-spacing: .06em;
-  color: rgba(255, 255, 255, .78);
-}
-.hero__note::before {
-  content: "";
-  display: inline-block;
-  width: .5em;
-  height: .58em;
-  border: 1.5px solid var(--brass);
-  border-bottom: none;
-  border-radius: 999px 999px 0 0;
-  margin-right: .5em;
-}
-
 .hero__arrow {
   position: absolute;
   top: 50%;

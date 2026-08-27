@@ -483,7 +483,7 @@
   if (constructorEl) {
     var cfg = {
       type: 'swing', model: 'dg3', height: 'std', transom: 'none',
-      finish: 'white', patina: 'none', glass: 'clear', hardware: 'brass',
+      finish: 'white', glass: 'clear', hardware: 'brass',
       hinges: 'std', wall: 'cream'
     };
 
@@ -493,7 +493,6 @@
       height: { std: 'высота 2000 мм', h2300: 'высота 2300 мм', ceiling: 'под потолок (до 2600 мм)' },
       transom: { none: 'без фрамуги', glass: 'фрамуга со стеклом' },
       finish: { white: 'эмаль белая RAL 9003', ivory: 'эмаль слоновая кость RAL 9010', grey: 'эмаль светло-серая RAL 7044', blue: 'эмаль голубая (NCS)', olive: 'эмаль олива (NCS)', graphite: 'эмаль графит', black: 'эмаль чёрная RAL 9005', oak: 'натуральный шпон дуба', oakgrey: 'дуб серый брашированный', alder: 'массив ольхи' },
-      patina: { none: 'без патины', silver: 'патина серебро', gold: 'патина золото' },
       glass: { clear: 'прозрачное осветлённое', satin: 'сатин', reeded: 'рифлёное', facet: 'с фацетом', stopsol: 'StopSol зеркальное' },
       hardware: { brass: 'латунь состаренная', gold: 'золото', chrome: 'хром', black: 'чёрная матовая' },
       hinges: { std: 'обычные петли', hidden: 'скрытые петли' }
@@ -501,7 +500,6 @@
 
     var FILL = { white: '#F2F0EB', ivory: '#F1EDE0', grey: '#C6C3BC', blue: '#7C99B4', olive: '#6B7159', graphite: '#3A3D40', black: '#1F1F21', oak: 'url(#wood-oak)', oakgrey: 'url(#wood-oakgrey)', alder: 'url(#wood-alder)' };
     var MOULD = { white: '#CFC9BF', ivory: '#D6CFBC', grey: '#A8A49C', blue: '#5E7C97', olive: '#545A46', graphite: '#232528', black: '#0E0E10', oak: '#654A32', oakgrey: '#6E6862', alder: '#9A6F4B' };
-    var PATINA = { silver: '#C7C9CC', gold: '#C9A96B' };
     var GLASS = { clear: '#CFE0E6', satin: '#E6EAEA', reeded: '#D7E2E4', facet: '#D3E4E9', stopsol: '#B3A48C' };
     var HW = { brass: '#B08D57', gold: '#C9A227', chrome: '#C9CDD1', black: '#2B2B2B' };
     var WALL = { cream: '#E6E0D6', blue: '#4E7396', olive: '#6F7462' };
@@ -586,7 +584,7 @@
     };
 
     var renderDoor = function () {
-      var mould = (cfg.patina !== 'none' && cfg.model !== 'modern' && cfg.model !== 'hidden') ? PATINA[cfg.patina] : MOULD[cfg.finish];
+      var mould = MOULD[cfg.finish];
       var isHiddenModel = cfg.model === 'hidden';
       var type = isHiddenModel ? 'swing' : cfg.type;
       var topY = cfg.height === 'std' ? 150 : (cfg.height === 'h2300' ? 88 : 30);
@@ -636,13 +634,11 @@
       }
       scene.innerHTML = s;
 
-      document.getElementById('copt-patina').hidden = (cfg.model === 'modern' || cfg.model === 'hidden');
       document.getElementById('copt-glass').hidden = !(cfg.model === 'country' || hasTransom);
       document.getElementById('copt-transom').hidden = (cfg.type === 'sliding' || cfg.model === 'hidden');
       document.getElementById('copt-hinges').hidden = (cfg.type === 'sliding' || cfg.model === 'hidden');
 
       var parts = [L.model[cfg.model], L.type[cfg.type === 'sliding' || cfg.type === 'double' ? cfg.type : 'swing'], L.finish[cfg.finish]];
-      if (cfg.patina !== 'none' && !document.getElementById('copt-patina').hidden) parts.push(L.patina[cfg.patina]);
       if (!document.getElementById('copt-glass').hidden) parts.push('стекло: ' + L.glass[cfg.glass]);
       if (hasTransom) parts.push(L.transom.glass);
       parts.push(L.height[cfg.height], L.hardware[cfg.hardware]);
@@ -655,7 +651,6 @@
         'Тип: ' + L.type[cfg.model === 'hidden' ? 'swing' : cfg.type],
         'Высота: ' + L.height[cfg.height],
         'Отделка: ' + L.finish[cfg.finish]];
-      if (cfg.patina !== 'none' && cfg.model !== 'modern' && cfg.model !== 'hidden') lines.push('Патина: ' + L.patina[cfg.patina]);
       if (cfg.model === 'country' || (cfg.transom === 'glass' && cfg.type !== 'sliding' && cfg.model !== 'hidden')) lines.push('Стекло: ' + L.glass[cfg.glass]);
       if (cfg.transom === 'glass' && cfg.type !== 'sliding' && cfg.model !== 'hidden') lines.push('Фрамуга: со стеклом');
       lines.push('Фурнитура: ' + L.hardware[cfg.hardware]);
