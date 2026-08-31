@@ -835,19 +835,19 @@ main { counter-reset: sec; }
 .gcard { display: flex; flex-direction: column; }
 /* при растяжении ряда лишнюю высоту забирает фото, а не пустота под подписью */
 .gcard__link { flex: 1 0 auto; min-height: 0; }
-.gallery__grid > li:first-child { grid-column: span 2; grid-row: span 2; }
-.gallery__grid > li:first-child .gcard__link {
+.gcard--xl { grid-column: span 2; grid-row: span 2; }
+.gcard--xl .gcard__link {
   aspect-ratio: auto;
   flex: 1 1 auto;
 }
-.gallery__grid > li:last-child { grid-column: span 2; }
-.gallery__grid > li:last-child .gcard__link {
+.gcard--wide { grid-column: span 2; }
+.gcard--wide .gcard__link {
   aspect-ratio: 16 / 9;
   flex: 0 0 auto;
 }
 
 /* арочные маски-порталы на части кадров */
-.gallery__grid > li:nth-child(even):not(:last-child) .gcard__link {
+.gcard--arch .gcard__link {
   border-radius: 999px 999px 0 0;
 }
 /* тонкий внутренний контур-арка на ховере */
