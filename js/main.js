@@ -747,4 +747,31 @@
       });
     });
   }
+
+  /* ---------- Галерея: свёрнутая витрина / полный лукбук ---------- */
+  var galleryToggle = document.getElementById('gallery-toggle');
+  var gallerySection = document.getElementById('gallery');
+  if (galleryToggle && gallerySection) {
+    var galleryTotal = gallerySection.querySelectorAll('.gcard').length;
+    galleryToggle.addEventListener('click', function () {
+      var collapsed = gallerySection.classList.toggle('gallery--collapsed');
+      galleryToggle.setAttribute('aria-expanded', String(!collapsed));
+      setBtnLabel(galleryToggle, collapsed ? 'Смотреть все ' + galleryTotal + ' работ' : 'Свернуть галерею');
+      /* при сворачивании возвращаем зрителя к началу секции, чтобы не «провалиться» вниз страницы */
+      if (collapsed) gallerySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  /* ---------- Заявки в Telegram-бот (токен появится после создания бота) ---------- */
+  var TG_BOT = { token: '', chatId: '' };
+  var sendLeadToBot = function (text) {
+    if (!TG_BOT.token || !TG_BOT.chatId || !window.fetch) return Promise.resolve(false);
+    return fetch('https://api.telegram.org/bot' + TG_BOT.token + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TG_BOT.chatId, text: text })
+    }).then(function (r) { return r.ok; }).catch(function () { return false; });
+  };
+  window.__hpSendLead = sendLeadToBot;
+
 })();

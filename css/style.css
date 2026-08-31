@@ -2101,3 +2101,30 @@ body.lightbox-open { overflow: hidden; }
     transition-duration: .01ms !important;
   }
 }
+
+/* ---------- Свёрнутая галерея: витрина + «провалиться внутрь» ---------- */
+/* без JS показываем всё; с JS первые 8 карточек (12 ячеек — полные ряды на всех экранах) */
+.js .gallery--collapsed .gallery__grid .gcard:nth-child(n+9) { display: none; }
+.js .gallery--collapsed .gallery__grid { position: relative; }
+.js .gallery--collapsed .gallery__grid::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 96px;
+  background: linear-gradient(to bottom, rgba(236, 232, 226, 0), var(--bg));
+  pointer-events: none;
+  z-index: 2;
+}
+.gallery__more { display: none; }
+.js .gallery__more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+.gallery__more-note {
+  font-size: .84rem;
+  font-weight: 300;
+  color: var(--text-muted);
+}
