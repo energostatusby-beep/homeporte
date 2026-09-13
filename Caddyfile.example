@@ -1,0 +1,6 @@
+# Replace example.com with the actual domain. Point its DNS to the VPS first.
+example.com {
+  reverse_proxy 127.0.0.1:8766 {
+    header_up X-Real-IP {remote_host}
+  }
+}

@@ -1,0 +1,24 @@
+services:
+  homeporte:
+    build: .
+    restart: unless-stopped
+    init: true
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8766
+      DATA_DIR: /app/var
+      NODE_ENV: production
+      TRUST_PROXY: 1
+    ports:
+      - "127.0.0.1:8766:8766"
+    volumes:
+      - leads:/app/var
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs: [/tmp]
+    stop_grace_period: 20s
+volumes:
+  leads:

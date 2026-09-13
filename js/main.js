@@ -121,7 +121,7 @@
         setActive(entry.target.id, entry.isIntersecting);
       });
     }, { rootMargin: '-40% 0px -55% 0px' });
-    ['about', 'gallery', 'projects', 'quiz', 'faq', 'contacts'].forEach(function (id) {
+    ['about', 'quiz', 'projects', 'faq', 'contacts'].forEach(function (id) {
       var el = document.getElementById(id);
       if (el) sectionObserver.observe(el);
     });
@@ -185,10 +185,11 @@
 
     if (lbImg && lbCaption && lbClose && lbPrev && lbNext) {
       var lbIndex = 0;
+      var activeGalleryLinks = galleryLinks;
 
       var showImage = function (index) {
-        lbIndex = (index + galleryLinks.length) % galleryLinks.length;
-        var link = galleryLinks[lbIndex];
+        lbIndex = (index + activeGalleryLinks.length) % activeGalleryLinks.length;
+        var link = activeGalleryLinks[lbIndex];
         var thumb = link.querySelector('img');
         lbImg.src = link.getAttribute('href');
         lbImg.alt = thumb ? thumb.alt : '';
@@ -203,7 +204,8 @@
       galleryLinks.forEach(function (link, i) {
         link.addEventListener('click', function (e) {
           e.preventDefault();
-          showImage(i);
+          activeGalleryLinks = galleryLinks.filter(function (item) { return item.dataset.project === link.dataset.project; });
+          showImage(activeGalleryLinks.indexOf(link));
           lightbox.showModal();
           document.body.classList.add('lightbox-open');
         });
@@ -240,6 +242,65 @@
   }
 
   /* ---------- Квиз «Рассчитать стоимость» ---------- */
+  /* Tokens and recipient IDs live only on the server. Retries reuse the same ID. */
+  var sendForm = async function (form, payload, button, status) {
+    if (form.dataset.sending === '1') return false;
+    var contact = form.querySelector('[name="contact"]');
+    var value = payload.contact;
+    var digits = value.replace(/\D/g, '');
+    if (!/^@[A-Za-z][A-Za-z0-9_]{4,31}$/.test(value) && !(/^\+?[\d\s()\-]+$/.test(value) && digits.length >= 7 && digits.length <= 15)) {
+      status.textContent = 'Введите телефон с кодом страны или Telegram в формате @username.';
+      status.dataset.state = 'error'; contact.focus(); return false;
+    }
+    // GitHub Pages cannot run the private lead API. Offer an explicit manual handoff.
+    if (location.hostname === 'energostatusby-beep.github.io') {
+      status.dataset.state = '';
+      status.textContent = 'Заявка подготовлена. Скопируйте текст и отправьте его менеджеру в Telegram.';
+      var manualText = ['Заявка HomePorte', payload.name && 'Имя: ' + payload.name, 'Контакт: ' + payload.contact, payload.item && 'Изделие: ' + payload.item, payload.qty && 'Количество: ' + payload.qty, payload.stage && 'Этап ремонта: ' + payload.stage, payload.comment].filter(Boolean).join('\n');
+      var preview = document.createElement('textarea');
+      preview.className = 'quiz__summary'; preview.readOnly = true; preview.rows = 5;
+      preview.setAttribute('aria-label', 'Текст заявки для Telegram'); preview.value = manualText;
+      status.appendChild(preview);
+      var copy = document.createElement('button'); copy.type = 'button'; copy.className = 'btn btn--outline'; copy.textContent = 'Скопировать заявку';
+      copy.addEventListener('click', async function () {
+        try { await navigator.clipboard.writeText(manualText); copy.textContent = 'Скопировано'; }
+        catch (_) { preview.focus(); preview.select(); copy.textContent = 'Выделено — скопируйте текст'; }
+      });
+      var link = document.createElement('a'); link.className = 'btn btn--solid'; link.href = 'https://t.me/HomePorteMinskMoscow';
+      link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Открыть Telegram';
+      var actions = document.createElement('span'); actions.className = 'lead-manual-actions'; actions.append(copy,link); status.appendChild(actions);
+      return false;
+    }
+    var packed = JSON.stringify(payload);
+    if (form._leadPayload !== packed) {
+      form._leadPayload = packed;
+      form._leadId = window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2) + '-lead';
+    }
+    form.dataset.sending = '1'; button.disabled = true;
+    form.setAttribute('aria-busy', 'true');
+    status.dataset.state = ''; status.textContent = 'Отправляем заявку…';
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, 15000);
+    try {
+      var response = await fetch('/api/leads', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({}, payload, {requestId: form._leadId, website: form.querySelector('[name="website"]').value})),
+        signal: controller.signal
+      });
+      var data;
+      try { data = await response.json(); } catch (_) { throw new Error('Приём заявок временно недоступен. Позвоните +375 29 144-96-66.'); }
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Не удалось отправить заявку. Попробуйте ещё раз.');
+      status.dataset.state = 'success';
+      status.textContent = 'Спасибо! Заявка принята. Свяжемся с вами с 11:00 до 19:00.';
+      return true;
+    } catch (error) {
+      status.dataset.state = 'error';
+      status.textContent = error.name === 'AbortError' || error instanceof TypeError ? 'Не удалось подтвердить приём. Повторите отправку — повторная заявка не создастся. Или позвоните +375 29 144-96-66.' : error.message;
+      return false;
+    } finally {
+      clearTimeout(timer); form.dataset.sending = '0'; button.disabled = false; form.removeAttribute('aria-busy');
+    }
+  };
   var quizForm = document.getElementById('quiz-form');
   if (quizForm) {
     var steps = Array.prototype.slice.call(quizForm.querySelectorAll('.quiz__step'));
@@ -249,100 +310,58 @@
     var quizNav = document.getElementById('quiz-nav');
     var result = document.getElementById('quiz-result');
     var summary = document.getElementById('quiz-summary');
-    var tgLink = document.getElementById('quiz-tg');
-    var mailLink = document.getElementById('quiz-mail');
+    var quizStatus = document.getElementById('quiz-status');
     var stepIndex = 0;
-
     var quizBar = document.getElementById('quiz-bar');
-
     var showStep = function (i) {
       stepIndex = i;
-      steps.forEach(function (s, k) {
-        s.hidden = (k !== i);
-        s.classList.remove('step-in');
-      });
-      /* перезапуск анимации входа шага */
-      void steps[i].offsetWidth;
-      steps[i].classList.add('step-in');
+      steps.forEach(function (s, k) { s.hidden = k !== i; s.classList.remove('step-in'); });
+      void steps[i].offsetWidth; steps[i].classList.add('step-in');
       progress.textContent = 'Шаг ' + (i + 1) + ' из ' + steps.length;
       if (quizBar) quizBar.style.width = ((i + 1) / steps.length * 100) + '%';
-      backBtn.hidden = (i === 0);
-      setBtnLabel(nextBtn2, (i === steps.length - 1) ? 'Готово' : 'Далее');
+      backBtn.hidden = i === 0;
+      setBtnLabel(nextBtn2, i === steps.length - 1 ? 'Отправить заявку' : 'Далее');
+      quizStatus.textContent = '';
     };
-
     var fieldValue = function (name) {
-      var el = quizForm.querySelector('[name="' + name + '"]:checked') ||
-               quizForm.querySelector('[name="' + name + '"]');
+      var el = quizForm.querySelector('[name="' + name + '"]:checked') || quizForm.querySelector('[name="' + name + '"]');
       return el ? el.value.trim() : '';
     };
-
-    var buildSummary = function () {
-      var lines = [
-        'Заявка с сайта HomePorte',
-        'Изделие: ' + fieldValue('item'),
-        'Количество: ' + fieldValue('qty'),
-        'Этап ремонта: ' + fieldValue('stage')
-      ];
-      var name = fieldValue('name');
-      var contact = fieldValue('contact');
-      var comment = fieldValue('comment');
-      if (name) lines.push('Имя: ' + name);
-      if (contact) lines.push('Контакт: ' + contact);
-      if (comment) lines.push('Комментарий: ' + comment);
-      return lines.join('\n');
+    var advanceQuiz = async function () {
+      if (quizForm.dataset.sending === '1' || !result.hidden) return;
+      if (stepIndex < steps.length - 1) { showStep(stepIndex + 1); return; }
+      var payload = {source:'quiz'};
+      ['name','contact','comment','item','qty','stage'].forEach(function (key) {payload[key] = fieldValue(key);});
+      backBtn.disabled = true;
+      var accepted = await sendForm(quizForm, payload, nextBtn2, quizStatus);
+      backBtn.disabled = false;
+      if (!accepted) return;
+      summary.value = ['Изделие: ' + payload.item, 'Количество: ' + payload.qty, 'Этап: ' + payload.stage, 'Имя: ' + payload.name, 'Контакт: ' + payload.contact, payload.comment].filter(Boolean).join('\n');
+      steps.forEach(function (s) {s.hidden = true;}); quizNav.hidden = true;
+      progress.textContent = 'Заявка принята'; quizStatus.textContent = ''; result.hidden = false;
     };
-
-    nextBtn2.addEventListener('click', function () {
-      if (stepIndex < steps.length - 1) {
-        showStep(stepIndex + 1);
-        return;
-      }
-      /* финал: собираем заявку */
-      var text = buildSummary();
-      summary.value = text;
-      mailLink.href = 'mailto:homeporte@yandex.by?subject=' +
-        encodeURIComponent('Заявка с сайта HomePorte') +
-        '&body=' + encodeURIComponent(text);
-      steps.forEach(function (s) { s.hidden = true; });
-      quizNav.hidden = true;
-      progress.textContent = 'Заявка сформирована';
-      if (quizBar) quizBar.style.width = '100%';
-      result.hidden = false;
-    });
-
-    backBtn.addEventListener('click', function () {
-      if (stepIndex > 0) showStep(stepIndex - 1);
-    });
-
-    /* Telegram не принимает текст в ссылке на чат — копируем заявку в буфер */
-    tgLink.addEventListener('click', function () {
-      if (navigator.clipboard) navigator.clipboard.writeText(summary.value).catch(function () {});
-      else { summary.select(); document.execCommand('copy'); }
-    });
-
-    quizForm.addEventListener('submit', function (e) { e.preventDefault(); });
+    nextBtn2.addEventListener('click', advanceQuiz);
+    backBtn.addEventListener('click', function () {if (stepIndex > 0) showStep(stepIndex - 1);});
+    quizForm.addEventListener('submit', function (e) {e.preventDefault(); advanceQuiz();});
+    var resetQuiz = function () { result.hidden = true; quizNav.hidden = false; showStep(0); };
+    document.getElementById('quiz-restart').addEventListener('click', function () {quizForm.reset(); resetQuiz();});
+    document.addEventListener('hp:configuration', resetQuiz);
     showStep(0);
   }
 
-  /* ---------- Быстрая форма ---------- */
-  var qfTg = document.getElementById('qf-tg');
-  var qfMail = document.getElementById('qf-mail');
-  if (qfTg && qfMail) {
-    var qfText = function () {
-      var name = (document.getElementById('qf-name').value || '').trim();
-      var contact = (document.getElementById('qf-contact').value || '').trim();
-      var lines = ['Заявка с сайта HomePorte — перезвоните мне'];
-      if (name) lines.push('Имя: ' + name);
-      if (contact) lines.push('Контакт: ' + contact);
-      return lines.join('\n');
-    };
-    qfTg.addEventListener('click', function () {
-      if (navigator.clipboard) navigator.clipboard.writeText(qfText()).catch(function () {});
+  var quickForm = document.getElementById('quick-form');
+  if (quickForm) {
+    quickForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var payload = {source:'quick', name:document.getElementById('qf-name').value.trim(), contact:document.getElementById('qf-contact').value.trim()};
+      var button = document.getElementById('qf-submit');
+      if (await sendForm(quickForm, payload, button, document.getElementById('qf-status'))) {
+        quickForm.reset(); button.disabled = true; setBtnLabel(button, 'Заявка принята');
+      }
     });
-    qfMail.addEventListener('click', function () {
-      qfMail.href = 'mailto:homeporte@yandex.by?subject=' +
-        encodeURIComponent('Заявка с сайта HomePorte') +
-        '&body=' + encodeURIComponent(qfText());
+    quickForm.addEventListener('input', function () {var b = document.getElementById('qf-submit'); if (quickForm.dataset.sending !== '1') {b.disabled = false; setBtnLabel(b, 'Отправить заявку'); document.getElementById('qf-status').textContent = '';}});
+    document.getElementById('qf-mail').addEventListener('click', function (e) {
+      e.currentTarget.href = 'mailto:homeporte@yandex.by?subject=' + encodeURIComponent('Заявка HomePorte') + '&body=' + encodeURIComponent(document.getElementById('qf-name').value + '\n' + document.getElementById('qf-contact').value);
     });
   }
 
@@ -482,26 +501,25 @@
   var constructorEl = document.getElementById('constructor');
   if (constructorEl) {
     var cfg = {
-      type: 'swing', model: 'dg3', height: 'std', transom: 'none',
+      type: 'swing', model: 'dg3', height: 2000, ral: '', transom: 'none',
       finish: 'white', glass: 'clear', hardware: 'brass',
       hinges: 'std', wall: 'cream'
     };
 
     var L = {
       type: { swing: 'распашная', double: 'двустворчатая', sliding: 'раздвижная' },
-      model: { dg2: 'Классика ДГ2', dg3: 'Классика ДГ3', palazzo: 'Палаццо', modern: 'Модерн (гладкая)', country: 'Кантри ДО со стеклом', hidden: 'дверь-невидимка' },
-      height: { std: 'высота 2000 мм', h2300: 'высота 2300 мм', ceiling: 'высота в потолок' },
-      transom: { none: 'без фрамуги', glass: 'фрамуга со стеклом' },
-      finish: { white: 'эмаль белая RAL 9003', ivory: 'эмаль слоновая кость RAL 9010', grey: 'эмаль светло-серая RAL 7044', blue: 'эмаль голубая (NCS)', olive: 'эмаль олива (NCS)', graphite: 'эмаль графит', black: 'эмаль чёрная RAL 9005', oak: 'натуральный шпон дуба', oakgrey: 'дуб серый', alder: 'массив ольхи' },
+      model: { dg2: 'Классика · 2 филёнки', dg3: 'Классика · 3 филёнки', palazzo: 'Круглая филёнка', modern: 'Модерн (гладкая)', country: 'Стекло с раскладкой', hidden: 'дверь-невидимка' },
+      transom: { none: 'без фрамуги', false: 'фальшфрамуга', glass: 'с фрамугой' },
+      finish: { white: 'эмаль белая RAL 9003', ivory: 'эмаль чистый белый RAL 9010', grey: 'эмаль светло-серая RAL 7044', blue: 'эмаль голубая (NCS)', olive: 'эмаль олива (NCS)', graphite: 'эмаль графит', black: 'эмаль чёрная RAL 9005', oak: 'натуральный шпон дуба', oakgrey: 'дуб серый', alder: 'массив ольхи' },
       glass: { clear: 'прозрачное осветлённое', satin: 'сатин', reeded: 'рифлёное', facet: 'с фацетом', stopsol: 'StopSol зеркальное' },
-      hardware: { brass: 'латунь состаренная', gold: 'золото', chrome: 'хром', black: 'чёрная матовая' },
+      hardware: { brass: 'латунь', gold: 'золото', chrome: 'хром', matteChrome: 'матовый хром', bronze: 'бронза', black: 'чёрная матовая' },
       hinges: { std: 'обычные петли', hidden: 'скрытые петли' }
     };
 
     var FILL = { white: '#F2F0EB', ivory: '#F1EDE0', grey: '#C6C3BC', blue: '#7C99B4', olive: '#6B7159', graphite: '#3A3D40', black: '#1F1F21', oak: 'url(#wood-oak)', oakgrey: 'url(#wood-oakgrey)', alder: 'url(#wood-alder)' };
     var MOULD = { white: '#CFC9BF', ivory: '#D6CFBC', grey: '#A8A49C', blue: '#5E7C97', olive: '#545A46', graphite: '#232528', black: '#0E0E10', oak: '#654A32', oakgrey: '#6E6862', alder: '#9A6F4B' };
     var GLASS = { clear: '#CFE0E6', satin: '#E6EAEA', reeded: '#D7E2E4', facet: '#D3E4E9', stopsol: '#B3A48C' };
-    var HW = { brass: '#B08D57', gold: '#C9A227', chrome: '#C9CDD1', black: '#2B2B2B' };
+    var HW = { brass: '#B08D57', gold: '#C9A227', chrome: '#C9CDD1', matteChrome: '#A9ADB0', bronze: '#8C6239', black: '#2B2B2B' };
     var WALL = { cream: '#E6E0D6', blue: '#4E7396', olive: '#6F7462' };
 
     var scene = document.getElementById('door-scene');
@@ -535,19 +553,6 @@
       return s;
     };
 
-    var herringboneSvg = function (x, y, w, h, mould) {
-      var s = '<clipPath id="hb-clip"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"/></clipPath>';
-      s += '<g clip-path="url(#hb-clip)" stroke="' + mould + '" stroke-width="1.1" opacity=".55">';
-      var band = 46;
-      for (var by = y, dir = 1; by < y + h; by += band, dir *= -1) {
-        for (var lx = -band; lx < w + band; lx += 11) {
-          var x1 = x + lx, y1 = dir > 0 ? by + band : by, y2 = dir > 0 ? by : by + band;
-          s += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + (x1 + band) + '" y2="' + y2 + '"/>';
-        }
-      }
-      return s + '</g>';
-    };
-
     var leafSvg = function (x, top, w, model, mould, hingeSide) {
       var bottom = 600, h = bottom - top;
       var s = '<rect x="' + x + '" y="' + top + '" width="' + w + '" height="' + h + '" fill="' + FILL[cfg.finish] + '" stroke="rgba(0,0,0,.22)" stroke-width="1.6"/>';
@@ -565,7 +570,7 @@
         s += panelSvg(px, pt + a + b + 32, pw, ph - a - b - 32, mould);
       } else if (model === 'palazzo') {
         s += panelSvg(px, pt, pw, ph, mould);
-        s += herringboneSvg(px + 10, pt + 10, pw - 20, ph - 20, mould);
+        s += '<circle cx="' + (px + pw / 2) + '" cy="' + (pt + ph * .6) + '" r="' + (pw * .43) + '" fill="' + FILL[cfg.finish] + '" stroke="' + mould + '" stroke-width="3"/>';
       } else if (model === 'country') {
         s += glassSvg(px, pt, pw, ph, mould, cfg.glass, true);
       }
@@ -587,8 +592,8 @@
       var mould = MOULD[cfg.finish];
       var isHiddenModel = cfg.model === 'hidden';
       var type = isHiddenModel ? 'swing' : cfg.type;
-      var topY = cfg.height === 'std' ? 150 : (cfg.height === 'h2300' ? 88 : 30);
-      var hasTransom = cfg.transom === 'glass' && type !== 'sliding' && !isHiddenModel;
+      var topY = 600 - Math.min(570, Math.max(180, cfg.height * 0.225));
+      var hasTransom = cfg.transom !== 'none' && type !== 'sliding' && !isHiddenModel;
       var leafTop = hasTransom ? topY + 74 : topY;
       var doorX, doorW;
       if (type === 'double') { doorX = 68; doorW = 224; }
@@ -607,7 +612,7 @@
         s += '<path d="M' + cx1 + ' 600 V' + cyT + ' H' + cx2 + ' V600 H' + (cx2 - 16) + ' V' + topY + ' H' + (cx1 + 16) + ' V600 Z" fill="' + FILL[cfg.finish] + '" stroke="rgba(0,0,0,.22)" stroke-width="1.4"/>';
       }
       if (hasTransom) {
-        s += glassSvg(doorX + 6, topY + 6, doorW - 12, 60, mould, cfg.glass, cfg.model === 'country');
+        s += cfg.transom === 'false' ? '<rect x="' + doorX + '" y="' + topY + '" width="' + doorW + '" height="66" fill="' + FILL[cfg.finish] + '" stroke="' + mould + '"/>' : glassSvg(doorX + 6, topY + 6, doorW - 12, 60, mould, cfg.glass, cfg.model === 'country');
         s += '<rect x="' + doorX + '" y="' + (topY + 66) + '" width="' + doorW + '" height="8" fill="' + FILL[cfg.finish] + '" stroke="rgba(0,0,0,.2)" stroke-width="1"/>';
       }
       if (type === 'sliding') {
@@ -634,14 +639,15 @@
       }
       scene.innerHTML = s;
 
-      document.getElementById('copt-glass').hidden = !(cfg.model === 'country' || hasTransom);
+      document.getElementById('copt-glass').hidden = !(cfg.model === 'country' || (hasTransom && cfg.transom === 'glass'));
       document.getElementById('copt-transom').hidden = (cfg.type === 'sliding' || cfg.model === 'hidden');
       document.getElementById('copt-hinges').hidden = (cfg.type === 'sliding' || cfg.model === 'hidden');
 
-      var parts = [L.model[cfg.model], L.type[cfg.type === 'sliding' || cfg.type === 'double' ? cfg.type : 'swing'], L.finish[cfg.finish]];
+      var parts = [L.model[cfg.model], L.type[type], L.finish[cfg.finish]];
       if (!document.getElementById('copt-glass').hidden) parts.push('стекло: ' + L.glass[cfg.glass]);
-      if (hasTransom) parts.push(L.transom.glass);
-      parts.push(L.height[cfg.height], L.hardware[cfg.hardware]);
+      if (hasTransom) parts.push(L.transom[cfg.transom]);
+      parts.push(('высота ' + cfg.height + ' мм'), L.hardware[cfg.hardware]);
+      if (cfg.ral) parts.push('Оттенок по запросу: ' + cfg.ral);
       document.getElementById('constructor-caption').textContent = parts.join(' · ');
     };
 
@@ -649,10 +655,11 @@
       var lines = ['Конфигурация двери с сайта HomePorte:',
         'Модель: ' + L.model[cfg.model],
         'Тип: ' + L.type[cfg.model === 'hidden' ? 'swing' : cfg.type],
-        'Высота: ' + L.height[cfg.height],
+        'Высота: ' + cfg.height + ' мм',
         'Отделка: ' + L.finish[cfg.finish]];
       if (cfg.model === 'country' || (cfg.transom === 'glass' && cfg.type !== 'sliding' && cfg.model !== 'hidden')) lines.push('Стекло: ' + L.glass[cfg.glass]);
-      if (cfg.transom === 'glass' && cfg.type !== 'sliding' && cfg.model !== 'hidden') lines.push('Фрамуга: со стеклом');
+      if (cfg.transom !== 'none' && cfg.type !== 'sliding' && cfg.model !== 'hidden') lines.push('Фрамуга: ' + L.transom[cfg.transom]);
+      if (cfg.ral) lines.push('Оттенок по запросу: ' + cfg.ral);
       lines.push('Фурнитура: ' + L.hardware[cfg.hardware]);
       if (cfg.type !== 'sliding' && cfg.model !== 'hidden') lines.push('Петли: ' + L.hinges[cfg.hinges]);
       lines.push('Хочу узнать стоимость.');
@@ -664,6 +671,11 @@
       group.querySelectorAll('.chip').forEach(function (chip) {
         chip.addEventListener('click', function () {
           cfg[opt] = chip.getAttribute('data-value');
+          if (cfg.model === 'hidden') cfg.type = 'swing';
+          constructorEl.querySelectorAll('[data-opt="type"] .chip').forEach(function (c) {
+            c.disabled = cfg.model === 'hidden' && c.dataset.value !== 'swing';
+            c.classList.toggle('is-on', c.dataset.value === cfg.type);
+          });
           group.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('is-on', c === chip); });
           renderDoor();
         });
@@ -678,18 +690,114 @@
       });
     });
 
-    document.getElementById('constructor-send').addEventListener('click', function () {
-      if (navigator.clipboard) navigator.clipboard.writeText(cfgText()).catch(function () {});
-    });
+    document.getElementById('constructor-send').addEventListener('click', function (e) { e.preventDefault(); document.getElementById('constructor-to-quiz').click(); });
 
     document.getElementById('constructor-to-quiz').addEventListener('click', function () {
+      document.dispatchEvent(new Event('hp:configuration'));
+      document.querySelector('#quiz-form [name="item"]').checked = true;
       var comment = document.querySelector('#quiz-form [name="comment"]');
       if (comment) comment.value = cfgText().replace('Конфигурация двери с сайта HomePorte:\n', 'Дверь из конфигуратора — ');
       var quizSection = document.getElementById('quiz');
       if (quizSection) quizSection.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     });
 
-    renderDoor();
+    document.getElementById('constructor-height').addEventListener('input', function (e) {
+      var value = Number(e.target.value);
+      if (!Number.isInteger(value) || value <= 0 || value > 3000) { e.target.setCustomValidity('Введите высоту в миллиметрах — целое число от 1 до 3000.'); return; }
+      e.target.setCustomValidity(''); cfg.height = value; renderDoor();
+    });
+    var ralChips = Array.prototype.slice.call(constructorEl.querySelectorAll('.ral-chip'));
+    var ralSelected = document.getElementById('ral-selected');
+    var syncRalSelection = function (code) {
+      ralChips.forEach(function (chip) {chip.setAttribute('aria-pressed', String(chip.dataset.ral === code));});
+    };
+    var applyRal = function (chip, fromPaint) {
+      var code = chip.dataset.ral, hex = chip.dataset.hex;
+      cfg.finish = 'ral'; cfg.ral = '';
+      FILL.ral = hex;
+      MOULD.ral = '#' + [1,3,5].map(function (i) {return Math.round(parseInt(hex.slice(i,i+2),16) * .72).toString(16).padStart(2,'0');}).join('');
+      L.finish.ral = 'эмаль RAL ' + code;
+      constructorEl.querySelectorAll('[data-opt="finish"] .chip').forEach(function (c) {c.classList.remove('is-on');});
+      syncRalSelection(code);
+      ralSelected.textContent = 'Выбрано: RAL ' + code;
+      document.getElementById('paint-sample').style.background = hex;
+      document.getElementById('paint-match').textContent = (fromPaint ? 'Близкий цвет: RAL ' : 'RAL ') + code;
+      if (!fromPaint) setPaintHex(hex);
+      renderDoor();
+    };
+    ralChips.forEach(function (chip) {
+      chip.addEventListener('click', function () {applyRal(chip, false);});
+    });
+    constructorEl.querySelectorAll('[data-opt="finish"] .chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var code = {white:'9003',ivory:'9010',grey:'7044',black:'9005'}[chip.dataset.value] || '';
+        syncRalSelection(code);
+        ralSelected.textContent = 'Выбрано: ' + (code ? 'RAL ' + code : L.finish[chip.dataset.value]);
+        if (code) { applyRal(ralChips.find(function(c) {return c.dataset.ral === code;}), false); }
+        else {document.getElementById('paint-match').textContent = L.finish[chip.dataset.value]; document.getElementById('paint-sample').style.background = chip.style.getPropertyValue('--sw');}
+
+      });
+    });
+    var filterRal = function () {
+      var query = document.getElementById('ral-search').value.toUpperCase().replace(/RAL|\s/g, '');
+      var family = document.getElementById('ral-family').value, count = 0;
+      ralChips.forEach(function (chip) {
+        chip.hidden = !chip.dataset.ral.includes(query) || (family && !chip.dataset.ral.startsWith(family));
+        if (!chip.hidden) count++;
+      });
+      document.getElementById('ral-count').textContent = count ? 'Найдено: ' + count : 'Цвет не найден. Проверьте номер или выберите другую группу.';
+    };
+    document.getElementById('ral-search').addEventListener('input', filterRal);
+    document.getElementById('ral-family').addEventListener('change', filterRal);
+    var paintField = document.getElementById('paint-field');
+    var paintHue = document.getElementById('paint-hue');
+    var paintCursor = document.getElementById('paint-cursor');
+    var hsv = {h:0,s:0,v:1};
+    var paintColors = ralChips.map(function (chip) {return {chip:chip,rgb:[1,3,5].map(function(i) {return parseInt(chip.dataset.hex.slice(i,i+2),16);})};});
+    var paintRgb = function () {
+      var h = hsv.h / 60, c = hsv.v * hsv.s, x = c * (1 - Math.abs(h % 2 - 1)), m = hsv.v-c;
+      var rgb = h < 1 ? [c,x,0] : h < 2 ? [x,c,0] : h < 3 ? [0,c,x] : h < 4 ? [0,x,c] : h < 5 ? [x,0,c] : [c,0,x];
+      return rgb.map(function (v) {return Math.round((v+m)*255);});
+    };
+    var drawPaint = function () {
+      paintField.style.setProperty('--hue', hsv.h);
+      paintCursor.style.left = (hsv.s*100)+'%'; paintCursor.style.top = ((1-hsv.v)*100)+'%';
+      paintHue.value = String(hsv.h);
+    };
+    var setPaintHex = function (hex) {
+      var rgb = [1,3,5].map(function(i) {return parseInt(hex.slice(i,i+2),16)/255;});
+      var max = Math.max.apply(null,rgb), min = Math.min.apply(null,rgb), delta = max-min;
+      hsv.v=max; hsv.s=max ? delta/max : 0;
+      if(delta) hsv.h = ((max===rgb[0] ? (rgb[1]-rgb[2])/delta : max===rgb[1] ? (rgb[2]-rgb[0])/delta+2 : (rgb[0]-rgb[1])/delta+4)*60+360)%360;
+      drawPaint();
+    };
+    var matchPaint = function () {
+      drawPaint();
+      var rgb=paintRgb(), best=paintColors[0], distance=Infinity;
+      paintColors.forEach(function(color) {
+        var d=color.rgb.reduce(function(sum,value,i) {return sum+(value-rgb[i])*(value-rgb[i]);},0);
+        if(d<distance) {distance=d;best=color;}
+      });
+      applyRal(best.chip,true);
+    };
+    var movePaint = function(e) {
+      var rect=paintField.getBoundingClientRect();
+      hsv.s=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
+      hsv.v=1-Math.max(0,Math.min(1,(e.clientY-rect.top)/rect.height));
+      matchPaint();
+    };
+    paintField.addEventListener('pointerdown', function(e) {if(e.button!==0)return;paintField.setPointerCapture(e.pointerId);movePaint(e);});
+    paintField.addEventListener('pointermove', function(e) {if(paintField.hasPointerCapture(e.pointerId))movePaint(e);});
+    paintField.addEventListener('pointerup', function(e) {if(paintField.hasPointerCapture(e.pointerId))paintField.releasePointerCapture(e.pointerId);});
+    paintField.addEventListener('keydown',function(e) {
+      var step=e.shiftKey ? .1 : .01;
+      if(e.key==='ArrowLeft')hsv.s-=step;else if(e.key==='ArrowRight')hsv.s+=step;
+      else if(e.key==='ArrowUp')hsv.v+=step;else if(e.key==='ArrowDown')hsv.v-=step;else return;
+      e.preventDefault();hsv.s=Math.max(0,Math.min(1,hsv.s));hsv.v=Math.max(0,Math.min(1,hsv.v));matchPaint();
+    });
+    paintHue.addEventListener('input',function() {hsv.h=Number(paintHue.value);matchPaint();});
+    applyRal(ralChips.find(function(c) {return c.dataset.ral==='9003';}),false);
+
   }
   /* ---------- Exit-попап с гайдом ---------- */
   var exitOffer = document.getElementById('exit-offer');
@@ -750,28 +858,16 @@
 
   /* ---------- Галерея: свёрнутая витрина / полный лукбук ---------- */
   var galleryToggle = document.getElementById('gallery-toggle');
-  var gallerySection = document.getElementById('gallery');
+  var gallerySection = document.getElementById('projects');
   if (galleryToggle && gallerySection) {
-    var galleryTotal = gallerySection.querySelectorAll('.gcard').length;
+    var galleryTotal = gallerySection.querySelectorAll('.project').length;
     galleryToggle.addEventListener('click', function () {
-      var collapsed = gallerySection.classList.toggle('gallery--collapsed');
+      var collapsed = gallerySection.classList.toggle('projects--collapsed');
       galleryToggle.setAttribute('aria-expanded', String(!collapsed));
-      setBtnLabel(galleryToggle, collapsed ? 'Смотреть все ' + galleryTotal + ' работ' : 'Свернуть галерею');
+      setBtnLabel(galleryToggle, collapsed ? 'Смотреть все ' + galleryTotal + ' проектов' : 'Свернуть проекты');
       /* при сворачивании возвращаем зрителя к началу секции, чтобы не «провалиться» вниз страницы */
       if (collapsed) gallerySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }
-
-  /* ---------- Заявки в Telegram-бот (токен появится после создания бота) ---------- */
-  var TG_BOT = { token: '', chatId: '' };
-  var sendLeadToBot = function (text) {
-    if (!TG_BOT.token || !TG_BOT.chatId || !window.fetch) return Promise.resolve(false);
-    return fetch('https://api.telegram.org/bot' + TG_BOT.token + '/sendMessage', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: TG_BOT.chatId, text: text })
-    }).then(function (r) { return r.ok; }).catch(function () { return false; });
-  };
-  window.__hpSendLead = sendLeadToBot;
 
 })();
