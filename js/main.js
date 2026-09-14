@@ -864,7 +864,7 @@
     galleryToggle.addEventListener('click', function () {
       var collapsed = gallerySection.classList.toggle('projects--collapsed');
       galleryToggle.setAttribute('aria-expanded', String(!collapsed));
-      setBtnLabel(galleryToggle, collapsed ? 'Смотреть все ' + galleryTotal + ' проектов' : 'Свернуть проекты');
+      setBtnLabel(galleryToggle, collapsed ? 'Смотреть все проекты · ' + galleryTotal : 'Свернуть проекты');
       /* при сворачивании возвращаем зрителя к началу секции, чтобы не «провалиться» вниз страницы */
       if (collapsed) gallerySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
