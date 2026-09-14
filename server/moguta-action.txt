@@ -16,8 +16,44 @@
       exit;
     }
     $storage = sys_get_temp_dir() . '/homeporte-leads-' . sha1(__FILE__);
-    $result = homeporteAcceptLead(json_decode($raw, true), MG::getSetting('adminEmail'), $storage);
+    $result = homeporteAcceptLead(json_decode($raw, true), MG::getSetting('adminEmail'), $storage, null, null, $this->homeporteTelegramConfig());
     http_response_code($result[0]);
     echo json_encode($result[1]);
+    exit;
+  }
+
+  private function homeporteTelegramConfig() {
+    // Populated from the private .env during deployment; never commit credentials.
+    return /* HOMEPORTE_PRIVATE_CONFIG */ array('token' => '', 'chat_ids' => array(), 'counter_seed' => array());
+  }
+
+  public function homeporteDeliveryStatus() {
+    header('Content-Type: application/json; charset=UTF-8');
+    header('Cache-Control: no-store');
+    $user = (array) User::getThis();
+    if (!User::isAuth() || !isset($user['role']) || (int) $user['role'] !== 1) {
+      http_response_code(403);
+      echo json_encode(array('ok' => false));
+      exit;
+    }
+    try {
+      $config = $this->homeporteTelegramConfig();
+      $bot = homeporteTelegramRequest('getMe', array(), $config['token']);
+      $chats = array();
+      foreach ($config['chat_ids'] as $chatId) {
+        $chat = homeporteTelegramRequest('getChat', array('chat_id' => $chatId), $config['token']);
+        $chats[] = array('type' => $chat['type'], 'name' => isset($chat['title']) ? $chat['title'] : $chat['first_name']);
+      }
+      $result = array('ok' => true, 'bot' => $bot['username'], 'destinations' => $chats);
+      if (isset($_POST['requestId']) && is_string($_POST['requestId']) && preg_match('/^[A-Za-z0-9_-]{8,80}$/D', $_POST['requestId'])) {
+        $receipt = sys_get_temp_dir() . '/homeporte-leads-' . sha1(__FILE__) . '/lead-' . hash('sha256', $_POST['requestId']) . '.json';
+        $state = is_file($receipt) ? json_decode(file_get_contents($receipt), true) : null;
+        if ($state) $result['delivery'] = array('number' => $state['number'], 'telegram_confirmed' => isset($state['telegram']) ? count($state['telegram']) : 0, 'mail_copy_submitted' => !empty($state['mail_sent']), 'accepted' => !empty($state['accepted']));
+      }
+      echo json_encode($result);
+    } catch (Exception $error) {
+      http_response_code(503);
+      echo json_encode(array('ok' => false, 'error' => 'telegram_unavailable'));
+    }
     exit;
   }
