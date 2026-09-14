@@ -122,7 +122,6 @@
     "title": "Серые двери и стеновые панели",
     "photos": [
       "assets/img/gallery/64.jpg",
-      "assets/img/gallery/44.jpg",
       "assets/img/gallery/84.jpg",
       "assets/img/gallery/90.jpg"
     ],
@@ -142,7 +141,8 @@
     "title": "Лаконичная белая дверь",
     "photos": [
       "assets/img/gallery/46.jpg",
-      "assets/img/gallery/45.jpg"
+      "assets/img/gallery/45.jpg",
+      "assets/img/gallery/44.jpg"
     ],
     "description": "Белое полотно с прямоугольными филёнками и сдержанным обрамлением. В светлом интерьере дверь сочетается с высоким зеркалом и деревянным полом."
   },
