@@ -282,9 +282,11 @@
     var controller = new AbortController();
     var timer = setTimeout(function () { controller.abort(); }, 15000);
     try {
-      var response = await fetch('/api/leads', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(Object.assign({}, payload, {requestId: form._leadId, website: form.querySelector('[name="website"]').value})),
+      var leadConfig = document.querySelector('meta[name="homeporte-lead-api"]');
+      var requestBody = JSON.stringify(Object.assign({}, payload, {requestId: form._leadId, website: form.querySelector('[name="website"]').value}));
+      var response = await fetch(leadConfig ? leadConfig.content : '/api/leads', {
+        method: 'POST', headers: { 'Content-Type': leadConfig ? 'application/x-www-form-urlencoded;charset=UTF-8' : 'application/json' },
+        body: leadConfig ? new URLSearchParams({actionerClass: 'Ajaxuser', action: 'submitHomeporteLead', payload: requestBody}).toString() : requestBody,
         signal: controller.signal
       });
       var data;
@@ -693,6 +695,8 @@
     document.getElementById('constructor-send').addEventListener('click', function (e) { e.preventDefault(); document.getElementById('constructor-to-quiz').click(); });
 
     document.getElementById('constructor-to-quiz').addEventListener('click', function () {
+      var heightInput = document.getElementById('constructor-height');
+      if (!heightInput.reportValidity()) return;
       document.dispatchEvent(new Event('hp:configuration'));
       document.querySelector('#quiz-form [name="item"]').checked = true;
       var comment = document.querySelector('#quiz-form [name="comment"]');

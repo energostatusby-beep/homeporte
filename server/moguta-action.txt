@@ -1,0 +1,23 @@
+
+  public function submitHomeporteLead() {
+    header('Content-Type: application/json; charset=UTF-8');
+    header('Cache-Control: no-store');
+    $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+    $crossSite = isset($_SERVER['HTTP_SEC_FETCH_SITE']) && $_SERVER['HTTP_SEC_FETCH_SITE'] === 'cross-site';
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $crossSite || ($origin !== '' && !in_array($origin, array('https://homeporte.by', 'https://www.homeporte.by'), true))) {
+      http_response_code(403);
+      echo json_encode(array('ok' => false, 'error' => 'Отправьте заявку с сайта homeporte.by.'));
+      exit;
+    }
+    $raw = isset($_POST['payload']) && is_string($_POST['payload']) ? $_POST['payload'] : '';
+    if (strlen($raw) > 12000) {
+      http_response_code(413);
+      echo json_encode(array('ok' => false, 'error' => 'Сократите комментарий к заявке.'));
+      exit;
+    }
+    $storage = sys_get_temp_dir() . '/homeporte-leads-' . sha1(__FILE__);
+    $result = homeporteAcceptLead(json_decode($raw, true), MG::getSetting('adminEmail'), $storage);
+    http_response_code($result[0]);
+    echo json_encode($result[1]);
+    exit;
+  }

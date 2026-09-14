@@ -1721,9 +1721,10 @@ html:not(.js) .quiz__step[hidden] { display: block; }
 }
 .sticky-bar__cta {
   flex: 1;
+  min-width: 0;
   text-align: center;
   padding: 13px 10px;
-  font-size: .8rem;
+  font-size: clamp(.65rem, 3.2vw, .8rem);
   font-weight: 600;
   letter-spacing: .1em;
   text-transform: uppercase;
