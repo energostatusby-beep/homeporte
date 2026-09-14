@@ -122,15 +122,21 @@
     "title": "Серые двери и стеновые панели",
     "photos": [
       "assets/img/gallery/64.jpg",
-      "assets/img/gallery/40.jpg",
-      "assets/img/gallery/41.jpg",
-      "assets/img/gallery/42.jpg",
-      "assets/img/gallery/43.jpg",
       "assets/img/gallery/44.jpg",
       "assets/img/gallery/84.jpg",
       "assets/img/gallery/90.jpg"
     ],
-    "description": "Двери, высокие наличники и стеновые панели в близкой серой гамме. Крупные планы показывают профиль карниза, филёнки и металлические ручки."
+    "description": "Двери, высокие наличники и стеновые панели в близкой серой гамме."
+  },
+  {
+    "title": "Серо-оливковые двери с карнизом",
+    "photos": [
+      "assets/img/gallery/40.jpg",
+      "assets/img/gallery/41.jpg",
+      "assets/img/gallery/42.jpg",
+      "assets/img/gallery/43.jpg"
+    ],
+    "description": "Серо-оливковые двери с филёнками и ступенчатым карнизом сочетаются со светлыми стенами с молдингами. Общие планы и детали показывают профиль отделки и хромированную ручку."
   },
   {
     "title": "Лаконичная белая дверь",
